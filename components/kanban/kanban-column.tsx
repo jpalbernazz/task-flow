@@ -1,85 +1,40 @@
-"use client";
-
-import { useState } from "react";
-import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Task, TaskStatus } from "@/types/task";
-import { Button } from "@/components/ui/button";
-import { TaskCard } from "@/components/kanban/task-card";
+import type { Task, TaskStatus } from "@/types"
+import { cn } from "@/lib/utils"
+import { TaskCard } from "@/components/kanban/task-card"
 
 interface KanbanColumnProps {
-  id: TaskStatus;
-  title: string;
-  color: string;
-  tasks: Task[];
-  isDragOver: boolean;
-  onDragStart: (task: Task) => void;
-  onDragEnd: () => void;
-  onDrop: (status: TaskStatus) => void;
+  id: TaskStatus
+  title: string
+  color: string
+  tasks: Task[]
 }
 
-export function KanbanColumn({
-  id,
-  title,
-  color,
-  tasks,
-  isDragOver,
-  onDragStart,
-  onDragEnd,
-  onDrop,
-}: KanbanColumnProps) {
-  const [isOverColumn, setIsOverColumn] = useState(false);
-
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    setIsOverColumn(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsOverColumn(false);
-  };
-
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    setIsOverColumn(false);
-    onDrop(id);
-  };
-
+export function KanbanColumn({ id, title, color, tasks }: KanbanColumnProps) {
   return (
-    <div
-      className={cn(
-        "flex min-h-[500px] w-80 shrink-0 flex-col rounded-xl bg-muted/50 transition-colors",
-        isOverColumn && isDragOver && "bg-primary/10 ring-2 ring-primary/30",
-      )}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+    <section
+      aria-labelledby={`kanban-${id}`}
+      className="flex min-h-[420px] w-full flex-col rounded-xl border bg-muted/40 sm:min-w-[320px]"
     >
-      <div className="flex items-center justify-between p-4">
+      <header className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className={cn("h-3 w-3 rounded-full", color)} />
-          <h3 className="font-semibold text-foreground">{title}</h3>
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
-            {tasks.length}
-          </span>
+          <span className={cn("h-2.5 w-2.5 rounded-full", color)} />
+          <h3 id={`kanban-${id}`} className="text-sm font-semibold text-foreground">{title}</h3>
         </div>
 
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Plus className="h-4 w-4" />
-          <span className="sr-only">Adicionar tarefa</span>
-        </Button>
-      </div>
+        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+          {tasks.length}
+        </span>
+      </header>
 
-      <div className="flex flex-1 flex-col gap-3 p-4 pt-0">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-          />
-        ))}
+      <div className="flex flex-1 flex-col gap-3 p-3">
+        {tasks.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
+            Sem tarefas
+          </div>
+        ) : (
+          tasks.map((task) => <TaskCard key={task.id} task={task} />)
+        )}
       </div>
-    </div>
-  );
+    </section>
+  )
 }

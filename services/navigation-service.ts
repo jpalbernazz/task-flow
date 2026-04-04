@@ -6,16 +6,16 @@ import {
   LayoutDashboard,
   Settings,
 } from "lucide-react"
-import type { NavigationItem } from "@/types/navigation"
+import type { NavigationItem } from "@/types"
 
 export const mainNavigationItems: NavigationItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
+  { label: "Painel", href: "/", icon: LayoutDashboard },
   { label: "Projetos", href: "/projects", icon: FolderKanban },
   { label: "Tarefas", href: "/tasks", icon: CheckSquare },
   { label: "Calendario", href: "/calendar", icon: Calendar },
 ]
 
 export const secondaryNavigationItems: NavigationItem[] = [
-  { label: "Configuracoes", href: "/settings", icon: Settings },
-  { label: "Ajuda", href: "/help", icon: HelpCircle },
+  { label: "Configuracoes", href: "/configuracoes", icon: Settings },
+  { label: "Ajuda", href: "/ajuda", icon: HelpCircle },
 ]

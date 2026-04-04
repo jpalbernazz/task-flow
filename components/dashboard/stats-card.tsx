@@ -50,15 +50,9 @@ export function StatsCard({
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-muted-foreground">
-            {title}
-          </span>
-          <span className="text-3xl font-bold text-card-foreground">
-            {value}
-          </span>
-          {description && (
-            <span className="text-xs text-muted-foreground">{description}</span>
-          )}
+          <span className="text-sm font-medium text-muted-foreground">{title}</span>
+          <span className="text-3xl font-bold text-card-foreground">{value}</span>
+          {description && <span className="text-xs text-muted-foreground">{description}</span>}
           {trend && (
             <span
               className={cn(
@@ -71,12 +65,8 @@ export function StatsCard({
             </span>
           )}
         </div>
-        <div
-          className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-lg",
-            styles.iconBg
-          )}
-        >
+
+        <div className={cn("flex h-12 w-12 items-center justify-center rounded-lg", styles.iconBg)}>
           <Icon className={cn("h-6 w-6", styles.iconColor)} />
         </div>
       </div>

@@ -10,12 +10,8 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-6 md:gap-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground md:text-3xl">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Bem-vindo de volta! Aqui esta um resumo das suas tarefas.
-            </p>
+            <h1 className="text-2xl font-bold text-foreground md:text-3xl">Painel</h1>
+            <p className="text-muted-foreground">Bem-vindo de volta. Aqui esta um resumo das suas tarefas.</p>
           </div>
 
           <Button className="gap-2">

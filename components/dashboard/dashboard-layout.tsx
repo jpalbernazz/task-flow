@@ -16,7 +16,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-background">
       <Sidebar />
       <MobileSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-      
+
       <div className="md:ml-64">
         <Topbar onMenuClick={() => setSidebarOpen(true)} />
         <main className="p-4 md:p-6 lg:p-8">{children}</main>

@@ -67,7 +67,7 @@ const mockTasks: Task[] = [
   {
     id: "1",
     title: "Criar wireframes da pagina inicial",
-    project: "Redesign Website",
+    project: "Redesign do Site",
     status: "in-progress",
     priority: "high",
     dueDate: "Hoje",
@@ -76,7 +76,7 @@ const mockTasks: Task[] = [
   {
     id: "2",
     title: "Revisar documentacao da API",
-    project: "Backend API",
+    project: "API de Backend",
     status: "todo",
     priority: "medium",
     dueDate: "Amanha",
@@ -85,7 +85,7 @@ const mockTasks: Task[] = [
   {
     id: "3",
     title: "Implementar autenticacao OAuth",
-    project: "App Mobile",
+    project: "Aplicativo Mobile",
     status: "overdue",
     priority: "high",
     dueDate: "Ontem",
@@ -116,16 +116,10 @@ export function TaskList() {
     <div className="rounded-xl border border-border bg-card shadow-sm">
       <div className="flex items-center justify-between border-b border-border p-4 md:p-6">
         <div>
-          <h2 className="text-lg font-semibold text-card-foreground">
-            Tarefas Recentes
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Suas tarefas mais recentes e seus status
-          </p>
+          <h2 className="text-lg font-semibold text-card-foreground">Tarefas Recentes</h2>
+          <p className="text-sm text-muted-foreground">Suas tarefas mais recentes e seus status</p>
         </div>
-        <Button variant="outline" size="sm">
-          Ver todas
-        </Button>
+        <Button variant="outline" size="sm">Ver todas</Button>
       </div>
 
       <div className="divide-y divide-border">
@@ -145,22 +139,13 @@ function TaskRow({ task }: { task: Task }) {
     <div className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50 md:p-5">
       <div className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-center md:gap-4">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-card-foreground">
-            {task.title}
-          </p>
+          <p className="truncate font-medium text-card-foreground">{task.title}</p>
           <p className="text-sm text-muted-foreground">{task.project}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
-          <Badge variant="secondary" className={cn("text-xs", status.className)}>
-            {status.label}
-          </Badge>
-          <Badge
-            variant="outline"
-            className={cn("text-xs", priority.className)}
-          >
-            {priority.label}
-          </Badge>
+          <Badge variant="secondary" className={cn("text-xs", status.className)}>{status.label}</Badge>
+          <Badge variant="outline" className={cn("text-xs", priority.className)}>{priority.label}</Badge>
         </div>
       </div>
 
@@ -186,9 +171,7 @@ function TaskRow({ task }: { task: Task }) {
         <DropdownMenuContent align="end">
           <DropdownMenuItem>Editar</DropdownMenuItem>
           <DropdownMenuItem>Duplicar</DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive">
-            Excluir
-          </DropdownMenuItem>
+          <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

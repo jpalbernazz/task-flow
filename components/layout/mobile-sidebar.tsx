@@ -31,12 +31,8 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
             <CheckSquare className="h-5 w-5 text-primary-foreground" />
           </div>
-          <SheetTitle className="text-lg font-semibold text-sidebar-foreground">
-            TaskFlow
-          </SheetTitle>
-          <SheetDescription className="sr-only">
-            Menu de navegacao principal
-          </SheetDescription>
+          <SheetTitle className="text-lg font-semibold text-sidebar-foreground">TaskFlow</SheetTitle>
+          <SheetDescription className="sr-only">Menu de navegacao principal</SheetDescription>
         </SheetHeader>
 
         <nav className="flex flex-1 flex-col gap-1 p-4">
