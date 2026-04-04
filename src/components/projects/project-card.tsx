@@ -1,5 +1,6 @@
 "use client"
 
+import type { ProjectCardItem } from "@/types"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -14,25 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
-interface Member {
-  name: string
-  avatar: string
-}
-
-interface ProjectCardData {
-  id: string
-  name: string
-  description: string
-  members: Member[]
-  deadline: string
-  progress: number
-  tasksCompleted: number
-  totalTasks: number
-  status: "planejado" | "em-andamento" | "concluido" | "atrasado"
-}
-
 interface ProjectCardProps {
-  project: ProjectCardData
+  project: ProjectCardItem
 }
 
 const statusConfig = {

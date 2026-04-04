@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import type { RecentTaskItem, RecentTaskPriority, RecentTaskStatus } from "@/types"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoreHorizontal, Clock } from "lucide-react"
@@ -12,24 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-type TaskStatus = "todo" | "in-progress" | "completed" | "overdue"
-type TaskPriority = "low" | "medium" | "high"
-
-interface Task {
-  id: string
-  title: string
-  project: string
-  status: TaskStatus
-  priority: TaskPriority
-  dueDate: string
-  assignee: {
-    name: string
-    avatar?: string
-    initials: string
-  }
+interface TaskListProps {
+  tasks: RecentTaskItem[]
 }
 
-const statusConfig: Record<TaskStatus, { label: string; className: string }> = {
+const statusConfig: Record<RecentTaskStatus, { label: string; className: string }> = {
   todo: {
     label: "A Fazer",
     className: "bg-muted text-muted-foreground",
@@ -48,7 +36,7 @@ const statusConfig: Record<TaskStatus, { label: string; className: string }> = {
   },
 }
 
-const priorityConfig: Record<TaskPriority, { label: string; className: string }> = {
+const priorityConfig: Record<RecentTaskPriority, { label: string; className: string }> = {
   low: {
     label: "Baixa",
     className: "border-muted-foreground/30 text-muted-foreground",
@@ -63,55 +51,7 @@ const priorityConfig: Record<TaskPriority, { label: string; className: string }>
   },
 }
 
-const mockTasks: Task[] = [
-  {
-    id: "1",
-    title: "Criar wireframes da pagina inicial",
-    project: "Redesign do Site",
-    status: "in-progress",
-    priority: "high",
-    dueDate: "Hoje",
-    assignee: { name: "Maria Silva", initials: "MS" },
-  },
-  {
-    id: "2",
-    title: "Revisar documentacao da API",
-    project: "API de Backend",
-    status: "todo",
-    priority: "medium",
-    dueDate: "Amanha",
-    assignee: { name: "Pedro Santos", initials: "PS" },
-  },
-  {
-    id: "3",
-    title: "Implementar autenticacao OAuth",
-    project: "Aplicativo Mobile",
-    status: "overdue",
-    priority: "high",
-    dueDate: "Ontem",
-    assignee: { name: "Ana Costa", initials: "AC" },
-  },
-  {
-    id: "4",
-    title: "Testar fluxo de checkout",
-    project: "E-commerce",
-    status: "completed",
-    priority: "medium",
-    dueDate: "Concluido",
-    assignee: { name: "Lucas Lima", initials: "LL" },
-  },
-  {
-    id: "5",
-    title: "Atualizar dependencias do projeto",
-    project: "Manutencao",
-    status: "todo",
-    priority: "low",
-    dueDate: "Em 3 dias",
-    assignee: { name: "Julia Oliveira", initials: "JO" },
-  },
-]
-
-export function TaskList() {
+export function TaskList({ tasks }: TaskListProps) {
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm">
       <div className="flex items-center justify-between border-b border-border p-4 md:p-6">
@@ -123,7 +63,7 @@ export function TaskList() {
       </div>
 
       <div className="divide-y divide-border">
-        {mockTasks.map((task) => (
+        {tasks.map((task) => (
           <TaskRow key={task.id} task={task} />
         ))}
       </div>
@@ -131,7 +71,7 @@ export function TaskList() {
   )
 }
 
-function TaskRow({ task }: { task: Task }) {
+function TaskRow({ task }: { task: RecentTaskItem }) {
   const status = statusConfig[task.status]
   const priority = priorityConfig[task.priority]
 

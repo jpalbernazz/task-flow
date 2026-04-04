@@ -6,21 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-interface CalendarTask {
-  id: string
-  title: string
-  date: string
-  priority: "alta" | "media" | "baixa"
-  type: "prazo" | "tarefa"
-}
-
-const sampleTasks: CalendarTask[] = [
-  { id: "1", title: "Entregar relatorio", date: "2026-04-03", priority: "alta", type: "prazo" },
-  { id: "2", title: "Reuniao de equipe", date: "2026-04-05", priority: "media", type: "tarefa" },
-  { id: "3", title: "Revisar codigo", date: "2026-04-08", priority: "baixa", type: "tarefa" },
-  { id: "4", title: "Prazo do projeto", date: "2026-04-10", priority: "alta", type: "prazo" },
-]
+import { getCalendarTasks } from "@/services/calendar-service"
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
 const MONTHS = [
@@ -38,9 +24,10 @@ const MONTHS = [
   "Dezembro",
 ]
 
-export default function CalendarPage() {
+export function CalendarPageView() {
   const [mounted, setMounted] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1))
+  const calendarTasks = getCalendarTasks()
 
   useEffect(() => {
     setMounted(true)
@@ -63,9 +50,9 @@ export default function CalendarPage() {
     return `${year}-${m}-${d}`
   }
 
-  const getTasksForDate = (day: number): CalendarTask[] => {
+  const getTasksForDate = (day: number) => {
     const dateKey = formatDateKey(day)
-    return sampleTasks.filter((task) => task.date === dateKey)
+    return calendarTasks.filter((task) => task.date === dateKey)
   }
 
   const calendarDays: (number | null)[] = []
@@ -159,7 +146,7 @@ export default function CalendarPage() {
         <div className="rounded-xl border bg-card p-4 shadow-sm">
           <h3 className="mb-4 font-semibold">Proximos Prazos</h3>
           <div className="flex flex-col gap-3">
-            {sampleTasks
+            {calendarTasks
               .filter((task) => task.type === "prazo")
               .slice(0, 3)
               .map((task) => (
@@ -174,3 +161,5 @@ export default function CalendarPage() {
     </DashboardLayout>
   )
 }
+
+export default CalendarPageView

@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "backend:dev": "npm --prefix backend run dev",
+    "backend:db:migrate": "npm --prefix backend run db:migrate",
+    "backend:db:seed": "npm --prefix backend run db:seed",
+    "backend:db:setup": "npm --prefix backend run db:setup",
+    "backend:db:rebuild": "npm --prefix backend run db:rebuild"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

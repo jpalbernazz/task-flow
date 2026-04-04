@@ -2,8 +2,11 @@ import { Filter, LayoutGrid, List, Plus } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { KanbanBoard } from "@/components/kanban/kanban-board"
 import { Button } from "@/components/ui/button"
+import { getKanbanColumns } from "@/services/task-service"
 
-export default function TasksPage() {
+export function TasksPageView() {
+  const columns = getKanbanColumns()
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -15,11 +18,7 @@ export default function TasksPage() {
 
           <div className="flex items-center gap-2">
             <div className="flex items-center rounded-lg border border-border bg-card p-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 bg-primary/10 text-primary hover:bg-primary/20"
-              >
+              <Button variant="ghost" size="sm" className="h-8 bg-primary/10 text-primary hover:bg-primary/20">
                 <LayoutGrid className="h-4 w-4" />
                 <span className="sr-only">Visualizacao Kanban</span>
               </Button>
@@ -42,8 +41,10 @@ export default function TasksPage() {
           </div>
         </div>
 
-        <KanbanBoard />
+        <KanbanBoard columns={columns} />
       </div>
     </DashboardLayout>
   )
 }
+
+export default TasksPageView
