@@ -1,0 +1,196 @@
+"use client"
+
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MoreHorizontal, Clock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+type TaskStatus = "todo" | "in-progress" | "completed" | "overdue"
+type TaskPriority = "low" | "medium" | "high"
+
+interface Task {
+  id: string
+  title: string
+  project: string
+  status: TaskStatus
+  priority: TaskPriority
+  dueDate: string
+  assignee: {
+    name: string
+    avatar?: string
+    initials: string
+  }
+}
+
+const statusConfig: Record<TaskStatus, { label: string; className: string }> = {
+  todo: {
+    label: "A Fazer",
+    className: "bg-muted text-muted-foreground",
+  },
+  "in-progress": {
+    label: "Em Progresso",
+    className: "bg-primary/10 text-primary",
+  },
+  completed: {
+    label: "Concluida",
+    className: "bg-success/10 text-success",
+  },
+  overdue: {
+    label: "Atrasada",
+    className: "bg-destructive/10 text-destructive",
+  },
+}
+
+const priorityConfig: Record<TaskPriority, { label: string; className: string }> = {
+  low: {
+    label: "Baixa",
+    className: "border-muted-foreground/30 text-muted-foreground",
+  },
+  medium: {
+    label: "Media",
+    className: "border-warning/50 text-warning",
+  },
+  high: {
+    label: "Alta",
+    className: "border-destructive/50 text-destructive",
+  },
+}
+
+const mockTasks: Task[] = [
+  {
+    id: "1",
+    title: "Criar wireframes da pagina inicial",
+    project: "Redesign Website",
+    status: "in-progress",
+    priority: "high",
+    dueDate: "Hoje",
+    assignee: { name: "Maria Silva", initials: "MS" },
+  },
+  {
+    id: "2",
+    title: "Revisar documentacao da API",
+    project: "Backend API",
+    status: "todo",
+    priority: "medium",
+    dueDate: "Amanha",
+    assignee: { name: "Pedro Santos", initials: "PS" },
+  },
+  {
+    id: "3",
+    title: "Implementar autenticacao OAuth",
+    project: "App Mobile",
+    status: "overdue",
+    priority: "high",
+    dueDate: "Ontem",
+    assignee: { name: "Ana Costa", initials: "AC" },
+  },
+  {
+    id: "4",
+    title: "Testar fluxo de checkout",
+    project: "E-commerce",
+    status: "completed",
+    priority: "medium",
+    dueDate: "Concluido",
+    assignee: { name: "Lucas Lima", initials: "LL" },
+  },
+  {
+    id: "5",
+    title: "Atualizar dependencias do projeto",
+    project: "Manutencao",
+    status: "todo",
+    priority: "low",
+    dueDate: "Em 3 dias",
+    assignee: { name: "Julia Oliveira", initials: "JO" },
+  },
+]
+
+export function TaskList() {
+  return (
+    <div className="rounded-xl border border-border bg-card shadow-sm">
+      <div className="flex items-center justify-between border-b border-border p-4 md:p-6">
+        <div>
+          <h2 className="text-lg font-semibold text-card-foreground">
+            Tarefas Recentes
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Suas tarefas mais recentes e seus status
+          </p>
+        </div>
+        <Button variant="outline" size="sm">
+          Ver todas
+        </Button>
+      </div>
+
+      <div className="divide-y divide-border">
+        {mockTasks.map((task) => (
+          <TaskRow key={task.id} task={task} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function TaskRow({ task }: { task: Task }) {
+  const status = statusConfig[task.status]
+  const priority = priorityConfig[task.priority]
+
+  return (
+    <div className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50 md:p-5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-center md:gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-medium text-card-foreground">
+            {task.title}
+          </p>
+          <p className="text-sm text-muted-foreground">{task.project}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          <Badge variant="secondary" className={cn("text-xs", status.className)}>
+            {status.label}
+          </Badge>
+          <Badge
+            variant="outline"
+            className={cn("text-xs", priority.className)}
+          >
+            {priority.label}
+          </Badge>
+        </div>
+      </div>
+
+      <div className="hidden items-center gap-2 text-sm text-muted-foreground md:flex">
+        <Clock className="h-4 w-4" />
+        <span>{task.dueDate}</span>
+      </div>
+
+      <Avatar className="h-8 w-8">
+        <AvatarImage src={task.assignee.avatar} alt={task.assignee.name} />
+        <AvatarFallback className="bg-secondary text-xs text-secondary-foreground">
+          {task.assignee.initials}
+        </AvatarFallback>
+      </Avatar>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Opcoes</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem>Editar</DropdownMenuItem>
+          <DropdownMenuItem>Duplicar</DropdownMenuItem>
+          <DropdownMenuItem className="text-destructive">
+            Excluir
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  )
+}
