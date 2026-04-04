@@ -1,0 +1,35 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Task management API",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "db:migrate": "node scripts/run-sql.mjs src/database/migrations",
+    "db:seed": "node scripts/run-sql.mjs src/database/seeds",
+    "db:reset": "node scripts/run-sql.mjs src/database/scripts",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "db:rebuild": "npm run db:reset && npm run db:migrate && npm run db:seed"
+  },
+  "keywords": [
+    "express",
+    "postgres",
+    "tasks"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.18.2",
+    "@types/pg": "^8.15.6",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
