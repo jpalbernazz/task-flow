@@ -32,8 +32,6 @@ function buildDefaultTaskInput(totalTasks: number): CreateTaskInput {
     status: "todo",
     priority: "medium",
     dueDate,
-    assignedUserId: 1,
-    projectId: 1,
   }
 }
 
@@ -46,35 +44,79 @@ function buildKanbanColumns(tasks: TaskViewModel[]): KanbanColumnData[] {
 
 interface TasksPageViewProps {
   initialTasks: TaskViewModel[]
+  initialError?: string | null
 }
 
-export function TasksPageView({ initialTasks }: TasksPageViewProps) {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
+  if (error instanceof Error && error.message.trim() !== "") {
+    return error.message
+  }
+
+  return fallbackMessage
+}
+
+export function TasksPageView({ initialTasks, initialError = null }: TasksPageViewProps) {
   const [tasks, setTasks] = useState<TaskViewModel[]>(initialTasks)
+  const [errorMessage, setErrorMessage] = useState<string | null>(initialError)
+  const [infoMessage, setInfoMessage] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const refreshTasks = useCallback(async () => {
-    const taskList = await getTasks()
-    setTasks(taskList)
+    setIsRefreshing(true)
+
+    try {
+      const taskList = await getTasks()
+      setTasks(taskList)
+      setErrorMessage(null)
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar as tarefas."))
+    } finally {
+      setIsRefreshing(false)
+    }
   }, [])
 
   const columns = useMemo(() => buildKanbanColumns(tasks), [tasks])
 
   const handleCreateTask = useCallback(async () => {
-    await createTask(buildDefaultTaskInput(tasks.length))
-    await refreshTasks()
+    try {
+      await createTask(buildDefaultTaskInput(tasks.length))
+      setInfoMessage("Tarefa criada com sucesso.")
+      await refreshTasks()
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error, "Nao foi possivel criar a tarefa."))
+    }
   }, [tasks.length, refreshTasks])
 
   const handleMoveTask = useCallback(
     async (taskId: number, status: TaskStatus) => {
-      await updateTask(taskId, { status })
-      await refreshTasks()
+      try {
+        const updatedTask = await updateTask(taskId, { status })
+        if (!updatedTask) {
+          setErrorMessage("A tarefa nao foi encontrada para atualizar o status.")
+          return
+        }
+
+        await refreshTasks()
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error, "Nao foi possivel atualizar o status da tarefa."))
+      }
     },
     [refreshTasks]
   )
 
   const handleDeleteTask = useCallback(
     async (taskId: number) => {
-      await deleteTask(taskId)
-      await refreshTasks()
+      try {
+        const deleted = await deleteTask(taskId)
+        if (!deleted) {
+          setErrorMessage("A tarefa nao foi encontrada para exclusao.")
+          return
+        }
+
+        await refreshTasks()
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
+      }
     },
     [refreshTasks]
   )
@@ -96,8 +138,18 @@ export function TasksPageView({ initialTasks }: TasksPageViewProps) {
         description: editedDescription.trim() || task.description,
       }
 
-      await updateTask(task.id, payload)
-      await refreshTasks()
+      try {
+        const updatedTask = await updateTask(task.id, payload)
+        if (!updatedTask) {
+          setErrorMessage("A tarefa nao foi encontrada para edicao.")
+          return
+        }
+
+        setInfoMessage("Tarefa atualizada com sucesso.")
+        await refreshTasks()
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error, "Nao foi possivel editar a tarefa."))
+      }
     },
     [refreshTasks]
   )
@@ -105,6 +157,25 @@ export function TasksPageView({ initialTasks }: TasksPageViewProps) {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {errorMessage ? (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span>{errorMessage}</span>
+              <Button size="sm" variant="outline" onClick={() => void refreshTasks()} disabled={isRefreshing}>
+                Tentar novamente
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {infoMessage ? (
+          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-700">
+            {infoMessage}
+          </div>
+        ) : null}
+
+        {isRefreshing ? <p className="text-sm text-muted-foreground">Atualizando tarefas...</p> : null}
+
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Tarefas</h1>

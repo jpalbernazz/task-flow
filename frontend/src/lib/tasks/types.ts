@@ -8,8 +8,6 @@ export interface TaskApiModel {
   status: TaskStatus
   priority: TaskPriority
   due_date: string
-  assigned_user_id: number
-  project_id: number
 }
 
 export interface TaskViewModel {
@@ -19,8 +17,6 @@ export interface TaskViewModel {
   status: TaskStatus
   priority: TaskPriority
   dueDate: string
-  assignedUserId: number
-  projectId: number
 }
 
 export interface KanbanColumnData {

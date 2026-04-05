@@ -39,11 +39,23 @@ export function createTaskDTOToEntityInput(input: CreateTaskDTO): Omit<TaskEntit
 }
 
 export function updateTaskDTOToEntityInput(input: UpdateTaskDTO): Partial<Omit<TaskEntity, "id">> {
-  return {
-    title: input.title,
-    description: input.description,
-    status: input.status,
-    priority: input.priority,
-    due_date: input.dueDate,
+  const result: Partial<Omit<TaskEntity, "id">> = {}
+
+  if (input.title !== undefined) {
+    result.title = input.title
   }
+  if (input.description !== undefined) {
+    result.description = input.description
+  }
+  if (input.status !== undefined) {
+    result.status = input.status
+  }
+  if (input.priority !== undefined) {
+    result.priority = input.priority
+  }
+  if (input.dueDate !== undefined) {
+    result.due_date = input.dueDate
+  }
+
+  return result
 }

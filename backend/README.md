@@ -44,3 +44,29 @@ Uso no DBeaver:
 - `POST /tasks`
 - `PUT /tasks/:id`
 - `DELETE /tasks/:id`
+
+## Contrato de Tasks
+
+Respostas de tasks usam `due_date` (snake_case).
+
+Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
+
+```json
+{
+  "title": "Planejar sprint",
+  "description": "Definir backlog da proxima sprint",
+  "status": "todo",
+  "priority": "high",
+  "due_date": "2026-04-10"
+}
+```
+
+## Fluxo Local com Frontend
+
+1. Backend: `cp .env.template .env`
+2. Backend: `npm install`
+3. Backend: `npm run db:setup`
+4. Backend: `npm run dev`
+5. Frontend: criar `frontend/.env` a partir de `frontend/.env.template`
+6. Frontend: `npm install`
+7. Frontend: `npm run dev`

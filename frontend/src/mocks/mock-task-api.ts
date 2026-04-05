@@ -8,8 +8,6 @@ export const mockTaskApi: TaskApiModel[] = [
     status: "todo",
     priority: "high",
     due_date: "2026-04-12",
-    assigned_user_id: 1,
-    project_id: 1,
   },
   {
     id: 2,
@@ -18,8 +16,6 @@ export const mockTaskApi: TaskApiModel[] = [
     status: "in_progress",
     priority: "medium",
     due_date: "2026-04-09",
-    assigned_user_id: 2,
-    project_id: 1,
   },
   {
     id: 3,
@@ -28,7 +24,5 @@ export const mockTaskApi: TaskApiModel[] = [
     status: "done",
     priority: "low",
     due_date: "2026-04-05",
-    assigned_user_id: 3,
-    project_id: 1,
   },
 ]

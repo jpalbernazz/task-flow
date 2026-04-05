@@ -8,7 +8,5 @@ export function taskApiModelToViewModel(task: TaskApiModel): TaskViewModel {
     status: task.status,
     priority: task.priority,
     dueDate: task.due_date,
-    assignedUserId: task.assigned_user_id,
-    projectId: task.project_id,
   }
 }

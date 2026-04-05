@@ -28,8 +28,15 @@ const priorityStyleByLevel = {
 } as const
 
 function formatShortDate(dateString: string) {
-  const [year, month, day] = dateString.split("-")
-  return `${day}/${month}/${year}`
+  const hasDateOnlyFormat = /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+  const normalizedDate = hasDateOnlyFormat ? `${dateString}T00:00:00Z` : dateString
+  const parsedDate = new Date(normalizedDate)
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return dateString
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(parsedDate)
 }
 
 export function TaskCard({ task, onDeleteTask, onEditTask, dragDataTransferType }: TaskCardProps) {

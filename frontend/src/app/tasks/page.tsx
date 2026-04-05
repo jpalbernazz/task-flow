@@ -1,8 +1,16 @@
 import { TasksPageView } from "@/components/tasks/tasks-page"
+import type { TaskViewModel } from "@/lib/tasks/types"
 import { getTasks } from "@/services/task-service"
 
 export default async function TasksPage() {
-  const initialTasks = await getTasks()
+  let initialTasks: TaskViewModel[] = []
+  let initialError: string | null = null
 
-  return <TasksPageView initialTasks={initialTasks} />
+  try {
+    initialTasks = await getTasks()
+  } catch {
+    initialError = "Nao foi possivel carregar as tarefas na inicializacao."
+  }
+
+  return <TasksPageView initialTasks={initialTasks} initialError={initialError} />
 }

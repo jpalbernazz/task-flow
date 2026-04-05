@@ -35,11 +35,3 @@ export const projectsById: Record<number, Project> = mockProjects.reduce(
 export function getTasksByStatus(status: TaskStatus) {
   return mockTaskApi.filter((task) => task.status === status)
 }
-
-export function getTasksByProject(projectId: number) {
-  return mockTaskApi.filter((task) => task.project_id === projectId)
-}
-
-export function getTasksByAssignedUser(userId: number) {
-  return mockTaskApi.filter((task) => task.assigned_user_id === userId)
-}

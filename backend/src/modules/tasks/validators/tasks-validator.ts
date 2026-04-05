@@ -23,6 +23,10 @@ function hasValidDate(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value))
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
+}
+
 export function parseTaskId(value: unknown): number {
   if (typeof value !== "string") {
     throw new AppError(400, "id must be a number")
@@ -38,6 +42,11 @@ export function parseTaskId(value: unknown): number {
 
 export function validateCreateTaskPayload(payload: unknown): CreateTaskDTO {
   const data = payload as Partial<CreateTaskApiInput>
+  const rawPayload = isRecord(payload) ? payload : {}
+
+  if ("dueDate" in rawPayload) {
+    throw new AppError(400, "dueDate is not supported, use due_date")
+  }
 
   if (typeof data.title !== "string" || data.title.trim() === "") {
     throw new AppError(400, "title is required")
@@ -70,6 +79,11 @@ export function validateCreateTaskPayload(payload: unknown): CreateTaskDTO {
 
 export function validateUpdateTaskPayload(payload: unknown): UpdateTaskDTO {
   const data = payload as UpdateTaskApiInput
+  const rawPayload = isRecord(payload) ? payload : {}
+
+  if ("dueDate" in rawPayload) {
+    throw new AppError(400, "dueDate is not supported, use due_date")
+  }
 
   if (data.title !== undefined && (typeof data.title !== "string" || data.title.trim() === "")) {
     throw new AppError(400, "title must be a non-empty string")

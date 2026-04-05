@@ -1,8 +1,8 @@
 import { taskApiModelToViewModel } from "@/lib/tasks/task-mapper"
-import { mockTaskApi } from "@/mocks/mock-task-api"
 import type {
   KanbanColumnData,
   TaskApiModel,
+  TaskPriority,
   TaskStatus,
   TaskViewModel,
 } from "@/lib/tasks/types"
@@ -16,72 +16,124 @@ const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
 export type CreateTaskInput = Omit<TaskViewModel, "id">
 export type UpdateTaskInput = Partial<Omit<TaskViewModel, "id">>
 
-let taskStore: TaskApiModel[] = mockTaskApi.map((task) => ({ ...task }))
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001"
+const TASKS_ENDPOINT = `${API_BASE_URL}/tasks`
 
-function viewModelToTaskApiModel(task: TaskViewModel): TaskApiModel {
-  return {
-    id: task.id,
-    title: task.title,
-    description: task.description,
-    status: task.status,
-    priority: task.priority,
-    due_date: task.dueDate,
-    assigned_user_id: task.assignedUserId,
-    project_id: task.projectId,
-  }
+interface TaskWritePayload {
+  title: string
+  description: string
+  status: TaskStatus
+  priority: TaskPriority
+  due_date: string
 }
 
-function createTaskApiModelFromInput(id: number, input: CreateTaskInput): TaskApiModel {
+function toTaskWritePayload(input: CreateTaskInput): TaskWritePayload {
   return {
-    id,
     title: input.title,
     description: input.description,
     status: input.status,
     priority: input.priority,
     due_date: input.dueDate,
-    assigned_user_id: input.assignedUserId,
-    project_id: input.projectId,
   }
 }
 
-function getNextTaskId() {
-  return taskStore.reduce((maxId, task) => Math.max(maxId, task.id), 0) + 1
+function toTaskUpdatePayload(input: UpdateTaskInput): Partial<TaskWritePayload> {
+  const payload: Partial<TaskWritePayload> = {}
+
+  if (input.title !== undefined) {
+    payload.title = input.title
+  }
+  if (input.description !== undefined) {
+    payload.description = input.description
+  }
+  if (input.status !== undefined) {
+    payload.status = input.status
+  }
+  if (input.priority !== undefined) {
+    payload.priority = input.priority
+  }
+  if (input.dueDate !== undefined) {
+    payload.due_date = input.dueDate
+  }
+
+  return payload
+}
+
+function buildTaskEndpoint(id?: number): string {
+  if (id === undefined) {
+    return TASKS_ENDPOINT
+  }
+
+  return `${TASKS_ENDPOINT}/${id}`
+}
+
+async function throwApiError(response: Response, fallbackMessage: string): Promise<never> {
+  let message = fallbackMessage
+
+  try {
+    const data = (await response.json()) as { error?: string }
+    if (typeof data.error === "string" && data.error.trim() !== "") {
+      message = data.error
+    }
+  } catch {
+    // Keep fallback message when response body is empty or invalid JSON.
+  }
+
+  throw new Error(message)
 }
 
 export async function getTasks(): Promise<TaskViewModel[]> {
-  return taskStore.map(taskApiModelToViewModel)
+  const response = await fetch(buildTaskEndpoint(), { cache: "no-store" })
+  if (!response.ok) {
+    await throwApiError(response, "failed to fetch tasks")
+  }
+
+  const taskApiModels = (await response.json()) as TaskApiModel[]
+  return taskApiModels.map(taskApiModelToViewModel)
 }
 
 export async function createTask(input: CreateTaskInput): Promise<TaskViewModel> {
-  const newTask = createTaskApiModelFromInput(getNextTaskId(), input)
-  taskStore = [...taskStore, newTask]
+  const response = await fetch(buildTaskEndpoint(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(toTaskWritePayload(input)),
+  })
+  if (!response.ok) {
+    await throwApiError(response, "failed to create task")
+  }
 
-  return taskApiModelToViewModel(newTask)
+  const taskApiModel = (await response.json()) as TaskApiModel
+  return taskApiModelToViewModel(taskApiModel)
 }
 
 export async function updateTask(id: number, input: UpdateTaskInput): Promise<TaskViewModel | null> {
-  const taskToUpdate = taskStore.find((task) => task.id === id)
-  if (!taskToUpdate) {
-    return null
-  }
-
-  const currentViewModel = taskApiModelToViewModel(taskToUpdate)
-  const updatedTaskApiModel = viewModelToTaskApiModel({
-    ...currentViewModel,
-    ...input,
-    id,
+  const response = await fetch(buildTaskEndpoint(id), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(toTaskUpdatePayload(input)),
   })
 
-  taskStore = taskStore.map((task) => (task.id === id ? updatedTaskApiModel : task))
+  if (response.status === 404) {
+    return null
+  }
+  if (!response.ok) {
+    await throwApiError(response, "failed to update task")
+  }
 
-  return taskApiModelToViewModel(updatedTaskApiModel)
+  const taskApiModel = (await response.json()) as TaskApiModel
+  return taskApiModelToViewModel(taskApiModel)
 }
 
 export async function deleteTask(id: number): Promise<boolean> {
-  const initialSize = taskStore.length
-  taskStore = taskStore.filter((task) => task.id !== id)
+  const response = await fetch(buildTaskEndpoint(id), { method: "DELETE" })
+  if (response.status === 404) {
+    return false
+  }
+  if (!response.ok) {
+    await throwApiError(response, "failed to delete task")
+  }
 
-  return taskStore.length < initialSize
+  return true
 }
 
 export async function getTaskViewModels(): Promise<TaskViewModel[]> {
