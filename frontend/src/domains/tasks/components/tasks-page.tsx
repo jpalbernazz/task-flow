@@ -1,8 +1,8 @@
 import { Filter, LayoutGrid, List, Plus } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
-import { KanbanBoard } from "@/components/kanban/kanban-board"
 import { Button } from "@/components/ui/button"
-import { getKanbanColumns } from "@/services/task-service"
+import { getKanbanColumns } from "../services/task-service"
+import { KanbanBoard } from "./kanban-board"
 
 export function TasksPageView() {
   const columns = getKanbanColumns()

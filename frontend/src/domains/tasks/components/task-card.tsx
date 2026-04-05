@@ -1,11 +1,11 @@
 import { Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { Task } from "@/types"
+import type { TaskViewModel } from "../types/task-types"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
 interface TaskCardProps {
-  task: Task
+  task: TaskViewModel
 }
 
 const priorityStyleByLevel = {

@@ -1,7 +1,8 @@
 import "dotenv/config"
 import express from "express"
 import cors from "cors"
-import taskRoutes from "./routes/task-routes"
+import taskRoutes from "./modules/tasks/routes/task-routes"
+import { errorHandler } from "./shared/http/error-handler"
 
 const app = express()
 const port = Number(process.env.PORT ?? 3001)
@@ -15,10 +16,7 @@ app.get("/health", (_req, res) => {
 
 app.use(taskRoutes)
 
-app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(error)
-  res.status(500).json({ error: "internal server error" })
-})
+app.use(errorHandler)
 
 app.listen(port, () => {
   console.log(`API listening on port ${port}`)

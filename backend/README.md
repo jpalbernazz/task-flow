@@ -2,9 +2,20 @@
 
 ## Rodando a API
 
-1. `cp .env.example .env`
+1. `cp .env.template .env`
 2. `npm install`
 3. `npm run dev`
+
+## Estrutura por dominio
+
+- `src/modules/tasks/controllers` -> camada HTTP (request/response)
+- `src/modules/tasks/validators` -> validacao de payload e params
+- `src/modules/tasks/services` -> regras de negocio da feature
+- `src/modules/tasks/repositories` -> acesso ao banco (SQL)
+- `src/modules/tasks/mappers` -> mapeamento entre entity/dto/api model
+- `src/modules/tasks/types` -> contratos internos da feature
+- `src/shared/http` -> erro de aplicacao e middleware global
+- `src/database` -> conexao e scripts SQL versionados
 
 ## Banco de dados (PostgreSQL)
 

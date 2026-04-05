@@ -1,12 +1,12 @@
-import type { Task, TaskStatus } from "@/types"
 import { cn } from "@/lib/utils"
-import { TaskCard } from "@/components/kanban/task-card"
+import { TaskCard } from "./task-card"
+import type { TaskStatus, TaskViewModel } from "../types/task-types"
 
 interface KanbanColumnProps {
   id: TaskStatus
   title: string
   color: string
-  tasks: Task[]
+  tasks: TaskViewModel[]
 }
 
 export function KanbanColumn({ id, title, color, tasks }: KanbanColumnProps) {
