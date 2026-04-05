@@ -1,6 +1,6 @@
-import { taskApiModelToViewModel } from "../mappers/task-mapper"
-import { mockTaskApi } from "../mocks/mock-task-api"
-import type { KanbanColumnData, TaskStatus, TaskViewModel } from "../types/task-types"
+import { taskApiModelToViewModel } from "@/lib/tasks/task-mapper"
+import { mockTaskApi } from "@/mocks/mock-task-api"
+import type { KanbanColumnData, TaskStatus, TaskViewModel } from "@/lib/tasks/types"
 
 const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
   { id: "todo", title: "A Fazer", color: "bg-slate-400" },

@@ -1,6 +1,6 @@
 import { Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { TaskViewModel } from "../types/task-types"
+import type { TaskViewModel } from "@/lib/tasks/types"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 

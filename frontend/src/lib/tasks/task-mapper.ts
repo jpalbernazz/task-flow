@@ -1,4 +1,4 @@
-import type { TaskApiModel, TaskViewModel } from "../types/task-types"
+import type { TaskApiModel, TaskViewModel } from "./types"
 
 export function taskApiModelToViewModel(task: TaskApiModel): TaskViewModel {
   return {

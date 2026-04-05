@@ -1,5 +1,5 @@
 import { KanbanColumn } from "./kanban-column"
-import type { KanbanColumnData } from "../types/task-types"
+import type { KanbanColumnData } from "@/lib/tasks/types"
 
 interface KanbanBoardProps {
   columns: KanbanColumnData[]

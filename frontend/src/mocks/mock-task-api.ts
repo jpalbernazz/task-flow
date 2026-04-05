@@ -1,4 +1,4 @@
-import type { TaskApiModel } from "../types/task-types"
+import type { TaskApiModel } from "@/lib/tasks/types"
 
 export const mockTaskApi: TaskApiModel[] = [
   {

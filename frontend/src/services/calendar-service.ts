@@ -1,4 +1,4 @@
-import type { CalendarTask } from "@/types"
+import type { CalendarTask } from "@/lib/calendar/types"
 
 const calendarTasks: CalendarTask[] = [
   { id: "1", title: "Entregar relatorio", date: "2026-04-03", priority: "alta", type: "prazo" },

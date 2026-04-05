@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { TaskCard } from "./task-card"
-import type { TaskStatus, TaskViewModel } from "../types/task-types"
+import type { TaskStatus, TaskViewModel } from "@/lib/tasks/types"
 
 interface KanbanColumnProps {
   id: TaskStatus

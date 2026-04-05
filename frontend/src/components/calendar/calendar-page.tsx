@@ -6,23 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+  buildCalendarDays,
+  getMonthContext,
+  getTasksForDay,
+  getUpcomingDeadlines,
+  MONTHS,
+  priorityColors,
+  WEEKDAYS,
+} from "@/lib/calendar/calendar-utils"
 import { getCalendarTasks } from "@/services/calendar-service"
-
-const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
-const MONTHS = [
-  "Janeiro",
-  "Fevereiro",
-  "Marco",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
-]
 
 export function CalendarPageView() {
   const [mounted, setMounted] = useState(false)
@@ -33,38 +26,13 @@ export function CalendarPageView() {
     setMounted(true)
   }, [])
 
-  const year = currentDate.getFullYear()
-  const month = currentDate.getMonth()
-
-  const firstDayOfMonth = new Date(year, month, 1)
-  const lastDayOfMonth = new Date(year, month + 1, 0)
-  const startingDayOfWeek = firstDayOfMonth.getDay()
-  const daysInMonth = lastDayOfMonth.getDate()
+  const { year, month, startingDayOfWeek, daysInMonth } = getMonthContext(currentDate)
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1))
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1))
 
-  const formatDateKey = (day: number): string => {
-    const m = String(month + 1).padStart(2, "0")
-    const d = String(day).padStart(2, "0")
-    return `${year}-${m}-${d}`
-  }
-
-  const getTasksForDate = (day: number) => {
-    const dateKey = formatDateKey(day)
-    return calendarTasks.filter((task) => task.date === dateKey)
-  }
-
-  const calendarDays: (number | null)[] = []
-  for (let i = 0; i < startingDayOfWeek; i++) calendarDays.push(null)
-  for (let day = 1; day <= daysInMonth; day++) calendarDays.push(day)
-  while (calendarDays.length < 42) calendarDays.push(null)
-
-  const priorityColors = {
-    alta: "bg-destructive text-destructive-foreground",
-    media: "bg-warning text-warning-foreground",
-    baixa: "bg-muted text-muted-foreground",
-  }
+  const calendarDays = buildCalendarDays(startingDayOfWeek, daysInMonth)
+  const upcomingDeadlines = getUpcomingDeadlines(calendarTasks, 3)
 
   if (!mounted) {
     return (
@@ -115,7 +83,7 @@ export function CalendarPageView() {
 
           <div className="grid grid-cols-7">
             {calendarDays.map((day, index) => {
-              const tasks = day ? getTasksForDate(day) : []
+              const tasks = day ? getTasksForDay(calendarTasks, year, month, day) : []
               return (
                 <div
                   key={index}
@@ -146,15 +114,12 @@ export function CalendarPageView() {
         <div className="rounded-xl border bg-card p-4 shadow-sm">
           <h3 className="mb-4 font-semibold">Proximos Prazos</h3>
           <div className="flex flex-col gap-3">
-            {calendarTasks
-              .filter((task) => task.type === "prazo")
-              .slice(0, 3)
-              .map((task) => (
-                <div key={task.id} className="flex items-center justify-between rounded-lg border p-3">
-                  <span className="font-medium">{task.title}</span>
-                  <Badge className={priorityColors[task.priority]}>{task.priority}</Badge>
-                </div>
-              ))}
+            {upcomingDeadlines.map((task) => (
+              <div key={task.id} className="flex items-center justify-between rounded-lg border p-3">
+                <span className="font-medium">{task.title}</span>
+                <Badge className={priorityColors[task.priority]}>{task.priority}</Badge>
+              </div>
+            ))}
           </div>
         </div>
       </div>
