@@ -1,7 +1,7 @@
 import "dotenv/config"
 import express from "express"
 import cors from "cors"
-import taskRoutes from "./modules/tasks/routes/task-routes"
+import tasksRoutes from "./modules/tasks/routes/tasks-routes"
 import { errorHandler } from "./shared/http/error-handler"
 
 const app = express()
@@ -14,7 +14,7 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" })
 })
 
-app.use(taskRoutes)
+app.use(tasksRoutes)
 
 app.use(errorHandler)
 

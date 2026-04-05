@@ -4,7 +4,7 @@ import type {
   TaskDTO,
   TaskEntity,
   UpdateTaskDTO,
-} from "../types/task-types"
+} from "../types/tasks-types"
 
 export function entityToTaskDTO(entity: TaskEntity): TaskDTO {
   return {

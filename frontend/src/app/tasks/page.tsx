@@ -1,5 +1,8 @@
 import { TasksPageView } from "@/components/tasks/tasks-page"
+import { getTasks } from "@/services/task-service"
 
-export default function TasksPage() {
-  return <TasksPageView />
+export default async function TasksPage() {
+  const initialTasks = await getTasks()
+
+  return <TasksPageView initialTasks={initialTasks} />
 }

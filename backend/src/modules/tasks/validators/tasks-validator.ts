@@ -6,7 +6,7 @@ import type {
   TaskStatus,
   UpdateTaskApiInput,
   UpdateTaskDTO,
-} from "../types/task-types"
+} from "../types/tasks-types"
 
 const validStatus: TaskStatus[] = ["todo", "in_progress", "done"]
 const validPriority: TaskPriority[] = ["low", "medium", "high"]

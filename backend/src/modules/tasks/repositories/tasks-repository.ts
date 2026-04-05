@@ -1,6 +1,6 @@
 import type { QueryResult } from "pg"
 import pool from "../../../database/connection"
-import type { TaskEntity } from "../types/task-types"
+import type { TaskEntity } from "../types/tasks-types"
 
 export async function findAllTasks(): Promise<TaskEntity[]> {
   const result: QueryResult<TaskEntity> = await pool.query(

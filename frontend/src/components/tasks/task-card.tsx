@@ -1,3 +1,4 @@
+import type { DragEvent, KeyboardEvent } from "react"
 import { Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { TaskViewModel } from "@/lib/tasks/types"
@@ -6,6 +7,9 @@ import { Card, CardContent } from "@/components/ui/card"
 
 interface TaskCardProps {
   task: TaskViewModel
+  onDeleteTask: (taskId: number) => Promise<void>
+  onEditTask: (task: TaskViewModel) => Promise<void>
+  dragDataTransferType: string
 }
 
 const priorityStyleByLevel = {
@@ -28,11 +32,34 @@ function formatShortDate(dateString: string) {
   return `${day}/${month}/${year}`
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, onDeleteTask, onEditTask, dragDataTransferType }: TaskCardProps) {
   const priority = priorityStyleByLevel[task.priority]
+  const handleDragStart = (event: DragEvent<HTMLElement>) => {
+    event.dataTransfer.setData(dragDataTransferType, String(task.id))
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Delete") {
+      event.preventDefault()
+      void onDeleteTask(task.id)
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault()
+      void onEditTask(task)
+    }
+  }
 
   return (
-    <Card className="border-border bg-card shadow-sm transition-shadow hover:shadow-md">
+    <Card
+      className="border-border bg-card shadow-sm transition-shadow hover:shadow-md"
+      draggable
+      onDragStart={handleDragStart}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      onDoubleClick={() => void onEditTask(task)}
+      aria-label={`Tarefa ${task.title}`}
+    >
       <CardContent className="space-y-3 p-4">
         <h4 className="line-clamp-2 text-sm font-medium text-foreground">{task.title}</h4>
 

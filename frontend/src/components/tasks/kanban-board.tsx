@@ -1,11 +1,14 @@
 import { KanbanColumn } from "./kanban-column"
-import type { KanbanColumnData } from "@/lib/tasks/types"
+import type { KanbanColumnData, TaskStatus, TaskViewModel } from "@/lib/tasks/types"
 
 interface KanbanBoardProps {
   columns: KanbanColumnData[]
+  onMoveTask: (taskId: number, status: TaskStatus) => Promise<void>
+  onDeleteTask: (taskId: number) => Promise<void>
+  onEditTask: (task: TaskViewModel) => Promise<void>
 }
 
-export function KanbanBoard({ columns }: KanbanBoardProps) {
+export function KanbanBoard({ columns, onMoveTask, onDeleteTask, onEditTask }: KanbanBoardProps) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       {columns.map((column) => (
@@ -15,6 +18,9 @@ export function KanbanBoard({ columns }: KanbanBoardProps) {
           title={column.title}
           color={column.color}
           tasks={column.tasks}
+          onMoveTask={onMoveTask}
+          onDeleteTask={onDeleteTask}
+          onEditTask={onEditTask}
         />
       ))}
     </div>

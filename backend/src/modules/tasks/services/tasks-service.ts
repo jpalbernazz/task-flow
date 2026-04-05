@@ -3,9 +3,9 @@ import {
   createTaskDTOToEntityInput,
   entityToTaskDTO,
   updateTaskDTOToEntityInput,
-} from "../mappers/task-mapper"
-import { deleteTask, findAllTasks, findTaskById, insertTask, updateTask } from "../repositories/task-repository"
-import type { CreateTaskDTO, TaskDTO, UpdateTaskDTO } from "../types/task-types"
+} from "../mappers/tasks-mapper"
+import { deleteTask, findAllTasks, findTaskById, insertTask, updateTask } from "../repositories/tasks-repository"
+import type { CreateTaskDTO, TaskDTO, UpdateTaskDTO } from "../types/tasks-types"
 
 export async function getTasks(): Promise<TaskDTO[]> {
   const tasks = await findAllTasks()

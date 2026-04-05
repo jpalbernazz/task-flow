@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
-import { taskDTOToApiModel } from "../mappers/task-mapper"
-import { createTask, editTaskById, getTasks, removeTaskById } from "../services/task-service"
-import { parseTaskId, validateCreateTaskPayload, validateUpdateTaskPayload } from "../validators/task-validator"
+import { taskDTOToApiModel } from "../mappers/tasks-mapper"
+import { createTask, editTaskById, getTasks, removeTaskById } from "../services/tasks-service"
+import { parseTaskId, validateCreateTaskPayload, validateUpdateTaskPayload } from "../validators/tasks-validator"
 
 export async function listTasks(_req: Request, res: Response) {
   const tasks = await getTasks()
