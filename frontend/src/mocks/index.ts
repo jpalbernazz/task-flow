@@ -1,14 +1,19 @@
 import { mockProjects } from "@/mocks/projects"
-import { mockTasks } from "@/mocks/tasks"
+import { mockTaskApi } from "@/mocks/mock-task-api"
 import { mockUsers } from "@/mocks/users"
-import type { Project, TaskStatus, User } from "@/types"
+import { taskApiModelToViewModel } from "@/lib/tasks/task-mapper"
+import type { Project, User } from "@/lib/models/task-management"
+import type { TaskStatus } from "@/lib/tasks/types"
 
-export { mockProjects, mockTasks, mockUsers }
+export { mockProjects, mockTaskApi, mockUsers }
+
+export const mockTasks = mockTaskApi.map(taskApiModelToViewModel)
 
 export const mockData = {
   users: mockUsers,
   projects: mockProjects,
-  tasks: mockTasks,
+  taskApi: mockTaskApi,
+  taskView: mockTasks,
 }
 
 export const usersById: Record<number, User> = mockUsers.reduce(
@@ -28,13 +33,13 @@ export const projectsById: Record<number, Project> = mockProjects.reduce(
 )
 
 export function getTasksByStatus(status: TaskStatus) {
-  return mockTasks.filter((task) => task.status === status)
+  return mockTaskApi.filter((task) => task.status === status)
 }
 
 export function getTasksByProject(projectId: number) {
-  return mockTasks.filter((task) => task.projectId === projectId)
+  return mockTaskApi.filter((task) => task.project_id === projectId)
 }
 
 export function getTasksByAssignedUser(userId: number) {
-  return mockTasks.filter((task) => task.assignedUserId === userId)
+  return mockTaskApi.filter((task) => task.assigned_user_id === userId)
 }

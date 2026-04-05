@@ -1,7 +1,11 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type { RecentTaskItem, RecentTaskPriority, RecentTaskStatus } from "@/types"
+import type {
+  RecentTaskItem,
+  RecentTaskPriority,
+  RecentTaskStatus,
+} from "@/lib/dashboard/types"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoreHorizontal, Clock } from "lucide-react"

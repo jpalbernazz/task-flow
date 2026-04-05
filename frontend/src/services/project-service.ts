@@ -1,4 +1,4 @@
-import type { ProjectCardItem } from "@/types"
+import type { ProjectCardItem } from "@/lib/projects/types"
 
 const projects: ProjectCardItem[] = [
   {

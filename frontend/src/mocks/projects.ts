@@ -1,4 +1,4 @@
-import type { Project } from "@/types"
+import type { Project } from "@/lib/models/task-management"
 
 export const mockProjects: Project[] = [
   {

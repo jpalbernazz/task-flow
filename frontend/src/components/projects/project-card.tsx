@@ -1,6 +1,6 @@
 "use client"
 
-import type { ProjectCardItem } from "@/types"
+import type { ProjectCardItem } from "@/lib/projects/types"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"

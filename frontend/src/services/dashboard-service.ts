@@ -1,4 +1,4 @@
-import type { DashboardStat, RecentTaskItem } from "@/types"
+import type { DashboardStat, RecentTaskItem } from "@/lib/dashboard/types"
 
 const dashboardStats: DashboardStat[] = [
   {

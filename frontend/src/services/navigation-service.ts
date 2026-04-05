@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   Settings,
 } from "lucide-react"
-import type { NavigationItem } from "@/types"
+import type { NavigationItem } from "@/lib/navigation/types"
 
 export const mainNavigationItems: NavigationItem[] = [
   { label: "Painel", href: "/", icon: LayoutDashboard },
