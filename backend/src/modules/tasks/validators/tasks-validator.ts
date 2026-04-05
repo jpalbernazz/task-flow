@@ -29,12 +29,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function parseTaskId(value: unknown): number {
   if (typeof value !== "string") {
-    throw new AppError(400, "id must be a number")
+    throw new AppError(400, "id must be a positive integer")
   }
 
   const id = Number(value)
-  if (Number.isNaN(id)) {
-    throw new AppError(400, "id must be a number")
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new AppError(400, "id must be a positive integer")
   }
 
   return id
