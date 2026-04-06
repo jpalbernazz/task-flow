@@ -6,6 +6,7 @@ import type {
   RecentTaskPriority,
   RecentTaskStatus,
 } from "@/lib/dashboard/types"
+import { useDashboardPageContext } from "@/lib/dashboard/dashboard-page-context"
 import { Badge } from "@/components/ui/Badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar"
 import { MoreHorizontal, Clock } from "lucide-react"
@@ -16,10 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu"
-
-interface TaskListProps {
-  tasks: RecentTaskItem[]
-}
 
 const statusConfig: Record<RecentTaskStatus, { label: string; className: string }> = {
   todo: {
@@ -55,7 +52,9 @@ const priorityConfig: Record<RecentTaskPriority, { label: string; className: str
   },
 }
 
-export function TaskList({ tasks }: TaskListProps) {
+export function TaskList() {
+  const { recentTasks } = useDashboardPageContext()
+
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm">
       <div className="flex items-center justify-between border-b border-border p-4 md:p-6">
@@ -67,10 +66,10 @@ export function TaskList({ tasks }: TaskListProps) {
       </div>
 
       <div className="divide-y divide-border">
-        {tasks.length === 0 ? (
+        {recentTasks.length === 0 ? (
           <div className="p-6 text-sm text-muted-foreground">Nenhuma tarefa relevante encontrada no momento.</div>
         ) : (
-          tasks.map((task) => <TaskRow key={task.id} task={task} />)
+          recentTasks.map((task) => <TaskRow key={task.id} task={task} />)
         )}
       </div>
     </div>

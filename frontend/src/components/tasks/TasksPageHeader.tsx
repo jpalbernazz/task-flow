@@ -48,6 +48,9 @@ export function TasksPageHeader() {
               aria-label="Filtrar por projeto"
               placeholder="Todos os projetos"
               size={1}
+              readOnly
+              inputMode="none"
+              autoComplete="off"
               className="w-fit max-w-full **:data-[slot=input-group-control]:w-auto **:data-[slot=input-group-control]:field-sizing-content cursor-pointer **:data-[slot=input-group-control]:cursor-pointer **:data-[slot=input-group-addon]:cursor-pointer **:data-[slot=input-group-button]:cursor-pointer"
               showClear={selectedProjectFilter !== "all"}
             >

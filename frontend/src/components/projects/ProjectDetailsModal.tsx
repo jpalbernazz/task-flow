@@ -23,27 +23,14 @@ import {
 } from "@/components/ui/Drawer"
 import { projectStatusConfig } from "@/lib/projects/project-status"
 import type {
-  ProjectCardItem,
-  ProjectModalIntent,
-  ProjectModalMode,
   ProjectStatus,
 } from "@/lib/projects/types"
 import {
   useProjectDetailsFormController,
 } from "@/lib/projects/useProjectDetailsFormController"
+import { useProjectsPageContext } from "@/lib/projects/projects-page-context"
 import { useMediaQuery } from "@/lib/useMediaQuery"
-import type { CreateProjectInput, UpdateProjectInput } from "@/services/project-service"
 import { cn } from "@/lib/utils"
-
-interface ProjectDetailsModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  mode: ProjectModalMode
-  initialIntent?: ProjectModalIntent
-  project: ProjectCardItem | null
-  onCreate: (input: CreateProjectInput) => Promise<void>
-  onUpdate: (projectId: number, input: UpdateProjectInput) => Promise<void>
-}
 
 function formatDate(date: string): string {
   const hasDateOnlyFormat = /^\d{4}-\d{2}-\d{2}$/.test(date)
@@ -62,16 +49,17 @@ function formatDate(date: string): string {
   }).format(parsedDate)
 }
 
-export function ProjectDetailsModal({
-  open,
-  onOpenChange,
-  mode,
-  initialIntent = "view",
-  project,
-  onCreate,
-  onUpdate,
-}: ProjectDetailsModalProps) {
+export function ProjectDetailsModal() {
   const isDesktop = useMediaQuery("(min-width: 768px)")
+  const {
+    isModalOpen,
+    modalMode,
+    modalIntent,
+    selectedProject,
+    handleModalOpenChange,
+    handleCreateProject,
+    handleUpdateProject,
+  } = useProjectsPageContext()
 
   const {
     isEditing,
@@ -86,33 +74,33 @@ export function ProjectDetailsModal({
     handleCancelEditing,
     handleSubmit,
   } = useProjectDetailsFormController({
-    open,
-    mode,
-    initialIntent,
-    project,
-    onOpenChange,
-    onCreate,
-    onUpdate,
+    open: isModalOpen,
+    mode: modalMode,
+    initialIntent: modalIntent,
+    project: selectedProject,
+    onOpenChange: handleModalOpenChange,
+    onCreate: handleCreateProject,
+    onUpdate: handleUpdateProject,
   })
 
-  if (mode === "view" && !project) {
+  if (modalMode === "view" && !selectedProject) {
     return null
   }
 
   const renderViewMode = () => {
-    if (!project) {
+    if (!selectedProject) {
       return null
     }
 
-    const status = projectStatusConfig[project.status]
+    const status = projectStatusConfig[selectedProject.status]
 
     return (
       <div className="flex flex-col gap-5">
         <div className="flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/30 p-4">
           <div className="flex flex-col gap-1">
-            <p className="text-sm font-medium text-foreground">{project.name}</p>
+            <p className="text-sm font-medium text-foreground">{selectedProject.name}</p>
             <p className="text-sm text-muted-foreground">
-              {project.description.trim() === "" ? "Sem descricao." : project.description}
+              {selectedProject.description.trim() === "" ? "Sem descricao." : selectedProject.description}
             </p>
           </div>
           <Badge variant="secondary" className={cn("font-medium", status.className)}>
@@ -126,28 +114,28 @@ export function ProjectDetailsModal({
               <Calendar className="h-4 w-4" />
               <span className="text-xs uppercase tracking-wide">Prazo</span>
             </div>
-            <p className="text-sm font-medium text-foreground">{formatDate(project.deadline)}</p>
+            <p className="text-sm font-medium text-foreground">{formatDate(selectedProject.deadline)}</p>
           </div>
           <div className="rounded-lg border border-border p-3">
             <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
               <TrendingUp className="h-4 w-4" />
               <span className="text-xs uppercase tracking-wide">Progresso</span>
             </div>
-            <p className="text-sm font-medium text-foreground">{project.progress}%</p>
+            <p className="text-sm font-medium text-foreground">{selectedProject.progress}%</p>
           </div>
           <div className="rounded-lg border border-border p-3">
             <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-xs uppercase tracking-wide">Concluidas</span>
             </div>
-            <p className="text-sm font-medium text-foreground">{project.tasksCompleted} tarefas</p>
+            <p className="text-sm font-medium text-foreground">{selectedProject.tasksCompleted} tarefas</p>
           </div>
           <div className="rounded-lg border border-border p-3">
             <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
               <ListTodo className="h-4 w-4" />
               <span className="text-xs uppercase tracking-wide">Total</span>
             </div>
-            <p className="text-sm font-medium text-foreground">{project.totalTasks} tarefas</p>
+            <p className="text-sm font-medium text-foreground">{selectedProject.totalTasks} tarefas</p>
           </div>
         </div>
       </div>
@@ -216,13 +204,13 @@ export function ProjectDetailsModal({
   )
 
   const renderFooterActions = (isDrawer: boolean) => {
-    if (mode === "create") {
+    if (modalMode === "create") {
       const actions = (
         <>
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleModalOpenChange(false)}
             disabled={isSubmitting}
           >
             Cancelar
@@ -239,7 +227,7 @@ export function ProjectDetailsModal({
     if (!isEditing) {
       const actions = (
         <>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => handleModalOpenChange(false)}>
             Fechar
           </Button>
           <Button type="button" onClick={() => setIsEditing(true)}>
@@ -278,7 +266,7 @@ export function ProjectDetailsModal({
             {submitError}
           </div>
         ) : null}
-        {mode === "view" && !isEditing ? renderViewMode() : renderEditForm()}
+        {modalMode === "view" && !isEditing ? renderViewMode() : renderEditForm()}
       </div>
       {renderFooterActions(!isDesktop)}
     </form>
@@ -286,7 +274,7 @@ export function ProjectDetailsModal({
 
   if (isDesktop) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-2xl">
           <DialogHeader className="border-b border-border px-6 py-4 pr-12">
             <DialogTitle>{modalTitle}</DialogTitle>
@@ -299,7 +287,7 @@ export function ProjectDetailsModal({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={isModalOpen} onOpenChange={handleModalOpenChange}>
       <DrawerContent>
         <DrawerHeader className="border-b border-border pr-10">
           <DrawerTitle>{modalTitle}</DrawerTitle>

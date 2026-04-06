@@ -15,14 +15,10 @@ import {
 } from "@/components/ui/DropdownMenu"
 import { cn } from "@/lib/utils"
 import { projectStatusConfig } from "@/lib/projects/project-status"
-import type { ProjectModalIntent } from "@/lib/projects/types"
+import { useProjectsPageContext } from "@/lib/projects/projects-page-context"
 
 interface ProjectCardProps {
   project: ProjectCardItem
-  onOpenProject?: (
-    project: ProjectCardItem,
-    intent: ProjectModalIntent
-  ) => Promise<void> | void
 }
 
 function formatDate(date: string): string {
@@ -42,7 +38,8 @@ function formatDate(date: string): string {
   }).format(parsedDate)
 }
 
-export function ProjectCard({ project, onOpenProject }: ProjectCardProps) {
+export function ProjectCard({ project }: ProjectCardProps) {
+  const { handleOpenProjectModal } = useProjectsPageContext()
   const status = projectStatusConfig[project.status]
   const maxVisibleMembers = 3
   const extraMembers = project.members.length - maxVisibleMembers
@@ -67,12 +64,12 @@ export function ProjectCard({ project, onOpenProject }: ProjectCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => void onOpenProject?.(project, "view")}>
+              <DropdownMenuItem onSelect={() => handleOpenProjectModal(project, "view")}>
                 Ver detalhes
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() => {
-                  void onOpenProject?.(project, "edit")
+                  handleOpenProjectModal(project, "edit")
                 }}
               >
                 Editar projeto
@@ -130,7 +127,7 @@ export function ProjectCard({ project, onOpenProject }: ProjectCardProps) {
             variant="ghost"
             size="sm"
             className="text-primary hover:text-primary"
-            onClick={() => void onOpenProject?.(project, "view")}
+            onClick={() => handleOpenProjectModal(project, "view")}
           >
             Ver projeto
           </Button>

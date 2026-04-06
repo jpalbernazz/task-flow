@@ -14,6 +14,11 @@ import {
   updateProject,
 } from "@/services/project-service"
 
+interface UseProjectsPageControllerParams {
+  initialProjects: ProjectCardItem[]
+  initialError?: string | null
+}
+
 function normalizeSearchValue(value: string): string {
   return value
     .normalize("NFD")
@@ -22,10 +27,13 @@ function normalizeSearchValue(value: string): string {
     .trim()
 }
 
-export function useProjectsPageController() {
-  const [projects, setProjects] = useState<ProjectCardItem[]>([])
+export function useProjectsPageController({
+  initialProjects,
+  initialError = null,
+}: UseProjectsPageControllerParams) {
+  const [projects, setProjects] = useState<ProjectCardItem[]>(initialProjects)
   const [searchTerm, setSearchTerm] = useState("")
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(initialError)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -133,7 +141,17 @@ export function useProjectsPageController() {
     [],
   )
 
+  const viewState = useMemo(
+    () => ({
+      hasError: errorMessage !== null,
+      hasInfo: infoMessage !== null,
+      isRefreshing,
+    }),
+    [errorMessage, infoMessage, isRefreshing],
+  )
+
   return {
+    projects,
     searchTerm,
     setSearchTerm,
     filteredProjects,
@@ -150,5 +168,6 @@ export function useProjectsPageController() {
     handleOpenProjectModal,
     handleCreateProject,
     handleUpdateProject,
+    viewState,
   }
 }

@@ -1,3 +1,5 @@
+"use client"
+
 import type { DragEvent, KeyboardEvent } from "react"
 import { Calendar, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"

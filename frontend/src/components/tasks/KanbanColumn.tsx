@@ -1,3 +1,5 @@
+"use client"
+
 import type { DragEvent } from "react"
 import { cn } from "@/lib/utils"
 import { TaskCard } from "./TaskCard"

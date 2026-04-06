@@ -1,3 +1,5 @@
+"use client"
+
 import { KanbanColumn } from "./KanbanColumn"
 import { useTasksPageContext } from "@/lib/tasks/tasks-page-context"
 
