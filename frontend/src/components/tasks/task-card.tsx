@@ -20,11 +20,11 @@ const priorityStyleByLevel = {
   },
   medium: {
     label: "Media",
-    className: "bg-amber-100 text-amber-800",
+    className: "bg-warning/15 text-warning",
   },
   high: {
     label: "Alta",
-    className: "bg-rose-100 text-rose-800",
+    className: "bg-destructive/15 text-destructive",
   },
 } as const
 

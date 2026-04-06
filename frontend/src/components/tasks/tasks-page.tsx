@@ -18,9 +18,9 @@ import type { KanbanColumnData, TaskStatus, TaskViewModel } from "@/lib/tasks/ty
 import { KanbanBoard } from "./kanban-board"
 
 const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
-  { id: "todo", title: "A Fazer", color: "bg-slate-400" },
-  { id: "in_progress", title: "Em Progresso", color: "bg-amber-500" },
-  { id: "done", title: "Concluida", color: "bg-emerald-500" },
+  { id: "todo", title: "A Fazer", color: "bg-muted-foreground/70" },
+  { id: "in_progress", title: "Em Progresso", color: "bg-primary" },
+  { id: "done", title: "Concluida", color: "bg-success" },
 ]
 
 function buildDefaultTaskInput(totalTasks: number): CreateTaskInput {
@@ -240,7 +240,7 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
         ) : null}
 
         {infoMessage ? (
-          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-700">
+          <div className="rounded-lg border border-success/30 bg-success/10 p-3 text-sm text-success">
             {infoMessage}
           </div>
         ) : null}

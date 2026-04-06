@@ -19,7 +19,7 @@ export const MONTHS = [
 
 export const priorityColors = {
   high: "bg-destructive text-destructive-foreground",
-  medium: "bg-amber-100 text-amber-700",
+  medium: "bg-warning/15 text-warning",
   low: "bg-muted text-muted-foreground",
 } as const
 
@@ -36,9 +36,9 @@ export const statusLabels = {
 } as const
 
 export const statusColors = {
-  todo: "bg-slate-100 text-slate-700",
-  in_progress: "bg-amber-100 text-amber-700",
-  done: "bg-emerald-100 text-emerald-700",
+  todo: "bg-muted text-muted-foreground",
+  in_progress: "bg-primary/10 text-primary",
+  done: "bg-success/10 text-success",
 } as const
 
 export interface CalendarMonthSummary {

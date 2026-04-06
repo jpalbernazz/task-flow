@@ -179,7 +179,7 @@ export function ProjectsPageView() {
         ) : null}
 
         {infoMessage ? (
-          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-700">
+          <div className="rounded-lg border border-success/30 bg-success/10 p-3 text-sm text-success">
             {infoMessage}
           </div>
         ) : null}

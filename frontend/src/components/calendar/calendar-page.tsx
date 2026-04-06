@@ -170,7 +170,7 @@ export function CalendarPageView() {
         </div>
 
         {!isLoading && !errorMessage && calendarTasks.length > 0 && monthSummary.tasksInMonth === 0 ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
             Nao ha tarefas para {MONTHS[month].toLowerCase()} de {year}. Navegue pelos meses ou clique em Hoje.
           </div>
         ) : null}
