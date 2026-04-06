@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/Button"
+import { Input } from "@/components/ui/Input"
+import { Label } from "@/components/ui/Label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { CheckSquare, Mail, Lock, ArrowRight } from "lucide-react"
 
 export function LoginPageView() {
@@ -43,8 +43,8 @@ export function LoginPageView() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -60,7 +60,7 @@ export function LoginPageView() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
                   <Link href="/esqueci-senha" className="text-sm text-primary transition-colors hover:text-primary/80">

@@ -1,4 +1,4 @@
-import { LoginPageView } from "@/components/auth/login-page"
+import { LoginPageView } from "@/components/auth/LoginPage"
 
 export default function LoginPage() {
   return <LoginPageView />

@@ -6,16 +6,16 @@ import type {
   RecentTaskPriority,
   RecentTaskStatus,
 } from "@/lib/dashboard/types"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/Badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar"
 import { MoreHorizontal, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/DropdownMenu"
 
 interface TaskListProps {
   tasks: RecentTaskItem[]

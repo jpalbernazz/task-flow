@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { AlertTriangle, CheckCircle2, Clock, FolderOpen, ListTodo, Plus } from "lucide-react"
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
-import { StatsCard } from "@/components/dashboard/stats-card"
-import { TaskList } from "@/components/dashboard/task-list"
-import { Button } from "@/components/ui/button"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { StatsCard } from "@/components/dashboard/StatsCard"
+import { TaskList } from "@/components/dashboard/TaskList"
+import { Button } from "@/components/ui/Button"
+import { getErrorMessage } from "@/lib/get-error-message"
 import type { DashboardStat, RecentTaskItem } from "@/lib/dashboard/types"
 import { getDashboardData } from "@/services/dashboard-service"
 
@@ -15,14 +16,6 @@ const iconMap = {
   check: CheckCircle2,
   alert: AlertTriangle,
   folder: FolderOpen,
-}
-
-function getErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (error instanceof Error && error.message.trim() !== "") {
-    return error.message
-  }
-
-  return fallbackMessage
 }
 
 export function DashboardPageView() {

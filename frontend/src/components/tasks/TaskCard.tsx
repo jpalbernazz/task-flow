@@ -1,65 +1,60 @@
-import type { DragEvent, KeyboardEvent } from "react";
-import { Calendar, MoreHorizontal } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { TaskViewModel } from "@/lib/tasks/types";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import type { DragEvent, KeyboardEvent } from "react"
+import { Calendar, MoreHorizontal } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useTasksPageContext } from "@/lib/tasks/tasks-page-context"
+import type { TaskViewModel } from "@/lib/tasks/types"
+import { Badge } from "@/components/ui/Badge"
+import { Card, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/Button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { taskPriorityConfig } from "@/lib/tasks/task-meta";
+} from "@/components/ui/DropdownMenu"
+import { taskPriorityConfig } from "@/lib/tasks/task-meta"
 
 interface TaskCardProps {
-  task: TaskViewModel;
-  onDeleteTask: (taskId: number) => Promise<void>;
-  onOpenEditTask: (task: TaskViewModel) => void;
-  dragDataTransferType: string;
-  projectName: string | null;
+  task: TaskViewModel
+  dragDataTransferType: string
 }
 
 function formatShortDate(dateString: string) {
-  const hasDateOnlyFormat = /^\d{4}-\d{2}-\d{2}$/.test(dateString);
+  const hasDateOnlyFormat = /^\d{4}-\d{2}-\d{2}$/.test(dateString)
   const normalizedDate = hasDateOnlyFormat
     ? `${dateString}T00:00:00Z`
-    : dateString;
-  const parsedDate = new Date(normalizedDate);
+    : dateString
+  const parsedDate = new Date(normalizedDate)
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return dateString;
+    return dateString
   }
 
   return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(
     parsedDate,
-  );
+  )
 }
 
-export function TaskCard({
-  task,
-  onDeleteTask,
-  onOpenEditTask,
-  dragDataTransferType,
-  projectName,
-}: TaskCardProps) {
-  const priority = taskPriorityConfig[task.priority];
+export function TaskCard({ task, dragDataTransferType }: TaskCardProps) {
+  const { handleDeleteTask, handleOpenEditTaskModal, getProjectName } = useTasksPageContext()
+  const priority = taskPriorityConfig[task.priority]
+  const projectName = getProjectName(task.projectId)
+
   const handleDragStart = (event: DragEvent<HTMLElement>) => {
-    event.dataTransfer.setData(dragDataTransferType, String(task.id));
-  };
+    event.dataTransfer.setData(dragDataTransferType, String(task.id))
+  }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Delete") {
-      event.preventDefault();
-      void onDeleteTask(task.id);
+      event.preventDefault()
+      void handleDeleteTask(task.id)
     }
 
     if (event.key === "Enter") {
-      event.preventDefault();
-      onOpenEditTask(task);
+      event.preventDefault()
+      handleOpenEditTaskModal(task)
     }
-  };
+  }
 
   return (
     <Card
@@ -68,10 +63,10 @@ export function TaskCard({
       onDragStart={handleDragStart}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      onDoubleClick={() => onOpenEditTask(task)}
+      onDoubleClick={() => handleOpenEditTaskModal(task)}
       aria-label={`Tarefa ${task.title}`}
     >
-      <CardContent className="space-y-3 p-4">
+      <CardContent className="flex flex-col gap-3 p-4">
         <div className="flex items-start justify-between gap-2">
           <h4 className="line-clamp-2 text-sm font-medium text-foreground">
             {task.title}
@@ -89,13 +84,13 @@ export function TaskCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => onOpenEditTask(task)}>
+              <DropdownMenuItem onSelect={() => handleOpenEditTaskModal(task)}>
                 Editar
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 onSelect={() => {
-                  void onDeleteTask(task.id);
+                  void handleDeleteTask(task.id)
                 }}
               >
                 Excluir
@@ -125,5 +120,5 @@ export function TaskCard({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

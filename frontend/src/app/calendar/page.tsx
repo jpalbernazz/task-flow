@@ -1,4 +1,4 @@
-import { CalendarPageView } from "@/components/calendar/calendar-page"
+import { CalendarPageView } from "@/components/calendar/CalendarPage"
 
 export default function CalendarPage() {
   return <CalendarPageView />

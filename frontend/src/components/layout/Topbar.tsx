@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +9,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@/components/ui/DropdownMenu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 
 interface TopbarProps {
   onMenuClick?: () => void;

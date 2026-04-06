@@ -1,11 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { Button } from "@/components/ui/Button"
+import { Badge } from "@/components/ui/Badge"
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { getErrorMessage } from "@/lib/get-error-message"
 import {
   buildCalendarDays,
   buildTasksByDateMap,
@@ -25,14 +26,6 @@ import {
 } from "@/lib/calendar/calendar-utils"
 import type { CalendarTask } from "@/lib/calendar/types"
 import { getCalendarTasks } from "@/services/calendar-service"
-
-function getErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (error instanceof Error && error.message.trim() !== "") {
-    return error.message
-  }
-
-  return fallbackMessage
-}
 
 interface SummaryCardProps {
   label: string

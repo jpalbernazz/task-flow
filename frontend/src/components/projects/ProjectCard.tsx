@@ -1,21 +1,21 @@
 "use client"
 
 import type { ProjectCardItem } from "@/lib/projects/types"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { Card, CardContent, CardHeader } from "@/components/ui/Card"
+import { Avatar, AvatarFallback } from "@/components/ui/Avatar"
+import { Badge } from "@/components/ui/Badge"
+import { Progress } from "@/components/ui/Progress"
 import { Calendar, CheckCircle2, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/DropdownMenu"
 import { cn } from "@/lib/utils"
 import { projectStatusConfig } from "@/lib/projects/project-status"
-import type { ProjectModalIntent } from "@/components/projects/project-details-modal"
+import type { ProjectModalIntent } from "@/lib/projects/types"
 
 interface ProjectCardProps {
   project: ProjectCardItem
@@ -83,14 +83,14 @@ export function ProjectCard({ project, onOpenProject }: ProjectCardProps) {
           </DropdownMenu>
         </div>
 
-        <div className="space-y-1 pt-2">
+        <div className="flex flex-col gap-1 pt-2">
           <h3 className="leading-tight font-semibold text-foreground">{project.name}</h3>
           <p className="line-clamp-2 text-sm text-muted-foreground">{project.description}</p>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Progresso</span>
             <span className="font-medium text-foreground">{project.progress}%</span>

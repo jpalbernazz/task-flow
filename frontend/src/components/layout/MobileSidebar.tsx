@@ -14,7 +14,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
+} from "@/components/ui/Sheet"
 
 interface MobileSidebarProps {
   open: boolean

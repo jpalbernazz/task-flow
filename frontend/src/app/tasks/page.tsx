@@ -1,4 +1,9 @@
-import { TasksPageView } from "@/components/tasks/tasks-page"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { KanbanBoard } from "@/components/tasks/KanbanBoard"
+import { TaskDetailsModal } from "@/components/tasks/TaskDetailsModal"
+import { TasksPageFeedback } from "@/components/tasks/TasksPageFeedback"
+import { TasksPageHeader } from "@/components/tasks/TasksPageHeader"
+import { TasksPageProvider } from "@/lib/tasks/tasks-page-context"
 import type { TaskViewModel } from "@/lib/tasks/types"
 import { getTasks } from "@/services/task-service"
 
@@ -12,5 +17,17 @@ export default async function TasksPage() {
     initialError = "Nao foi possivel carregar as tarefas na inicializacao."
   }
 
-  return <TasksPageView initialTasks={initialTasks} initialError={initialError} />
+  return (
+    <TasksPageProvider initialTasks={initialTasks} initialError={initialError}>
+      <DashboardLayout>
+        <div className="flex flex-col gap-6">
+          <TasksPageFeedback />
+          <TasksPageHeader />
+          <KanbanBoard />
+        </div>
+
+        <TaskDetailsModal />
+      </DashboardLayout>
+    </TasksPageProvider>
+  )
 }
