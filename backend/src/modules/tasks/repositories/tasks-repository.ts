@@ -5,7 +5,7 @@ import type { TaskEntity } from "../types/tasks-types"
 export async function findAllTasks(): Promise<TaskEntity[]> {
   const result: QueryResult<TaskEntity> = await pool.query(
     `
-      SELECT id, title, description, status, priority, due_date
+      SELECT id, title, description, status, priority, due_date, project_id
       FROM tasks
       ORDER BY id ASC
     `
@@ -17,7 +17,7 @@ export async function findAllTasks(): Promise<TaskEntity[]> {
 export async function findTaskById(id: number): Promise<TaskEntity | null> {
   const result: QueryResult<TaskEntity> = await pool.query(
     `
-      SELECT id, title, description, status, priority, due_date
+      SELECT id, title, description, status, priority, due_date, project_id
       FROM tasks
       WHERE id = $1
     `,
@@ -30,11 +30,11 @@ export async function findTaskById(id: number): Promise<TaskEntity | null> {
 export async function insertTask(input: Omit<TaskEntity, "id">): Promise<TaskEntity> {
   const result: QueryResult<TaskEntity> = await pool.query(
     `
-      INSERT INTO tasks (title, description, status, priority, due_date)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, title, description, status, priority, due_date
+      INSERT INTO tasks (title, description, status, priority, due_date, project_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, title, description, status, priority, due_date, project_id
     `,
-    [input.title, input.description, input.status, input.priority, input.due_date]
+    [input.title, input.description, input.status, input.priority, input.due_date, input.project_id]
   )
 
   return result.rows[0]
@@ -48,11 +48,12 @@ export async function updateTask(id: number, input: Omit<TaskEntity, "id">): Pro
           description = $2,
           status = $3,
           priority = $4,
-          due_date = $5
-      WHERE id = $6
-      RETURNING id, title, description, status, priority, due_date
+          due_date = $5,
+          project_id = $6
+      WHERE id = $7
+      RETURNING id, title, description, status, priority, due_date, project_id
     `,
-    [input.title, input.description, input.status, input.priority, input.due_date, id]
+    [input.title, input.description, input.status, input.priority, input.due_date, input.project_id, id]
   )
 
   return result.rows[0] ?? null

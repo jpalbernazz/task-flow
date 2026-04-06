@@ -1,10 +1,8 @@
 import { AppError } from "../../../shared/http/app-error"
 import type {
-  CreateTaskApiInput,
   CreateTaskDTO,
   TaskPriority,
   TaskStatus,
-  UpdateTaskApiInput,
   UpdateTaskDTO,
 } from "../types/tasks-types"
 
@@ -23,8 +21,30 @@ function hasValidDate(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value))
 }
 
+function hasValidProjectId(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null
+}
+
+interface CreateTaskHttpInput {
+  title: string
+  description: string
+  status: TaskStatus
+  priority: TaskPriority
+  dueDate: string
+  projectId?: number | null
+}
+
+interface UpdateTaskHttpInput {
+  title?: string
+  description?: string
+  status?: TaskStatus
+  priority?: TaskPriority
+  dueDate?: string
+  projectId?: number | null
 }
 
 export function parseTaskId(value: unknown): number {
@@ -41,11 +61,14 @@ export function parseTaskId(value: unknown): number {
 }
 
 export function validateCreateTaskPayload(payload: unknown): CreateTaskDTO {
-  const data = payload as Partial<CreateTaskApiInput>
+  const data = payload as Partial<CreateTaskHttpInput>
   const rawPayload = isRecord(payload) ? payload : {}
 
-  if ("dueDate" in rawPayload) {
-    throw new AppError(400, "dueDate is not supported, use due_date")
+  if ("due_date" in rawPayload) {
+    throw new AppError(400, "due_date is not supported, use dueDate")
+  }
+  if ("project_id" in rawPayload) {
+    throw new AppError(400, "project_id is not supported, use projectId")
   }
 
   if (typeof data.title !== "string" || data.title.trim() === "") {
@@ -64,8 +87,11 @@ export function validateCreateTaskPayload(payload: unknown): CreateTaskDTO {
     throw new AppError(400, "priority must be low, medium or high")
   }
 
-  if (!hasValidDate(data.due_date)) {
-    throw new AppError(400, "due_date must be a valid date string")
+  if (!hasValidDate(data.dueDate)) {
+    throw new AppError(400, "dueDate must be a valid date string")
+  }
+  if (data.projectId !== undefined && data.projectId !== null && !hasValidProjectId(data.projectId)) {
+    throw new AppError(400, "projectId must be a positive integer or null")
   }
 
   return {
@@ -73,16 +99,20 @@ export function validateCreateTaskPayload(payload: unknown): CreateTaskDTO {
     description: data.description.trim(),
     status: data.status,
     priority: data.priority,
-    dueDate: data.due_date,
+    dueDate: data.dueDate,
+    projectId: data.projectId ?? null,
   }
 }
 
 export function validateUpdateTaskPayload(payload: unknown): UpdateTaskDTO {
-  const data = payload as UpdateTaskApiInput
+  const data = payload as UpdateTaskHttpInput
   const rawPayload = isRecord(payload) ? payload : {}
 
-  if ("dueDate" in rawPayload) {
-    throw new AppError(400, "dueDate is not supported, use due_date")
+  if ("due_date" in rawPayload) {
+    throw new AppError(400, "due_date is not supported, use dueDate")
+  }
+  if ("project_id" in rawPayload) {
+    throw new AppError(400, "project_id is not supported, use projectId")
   }
 
   if (data.title !== undefined && (typeof data.title !== "string" || data.title.trim() === "")) {
@@ -101,8 +131,11 @@ export function validateUpdateTaskPayload(payload: unknown): UpdateTaskDTO {
     throw new AppError(400, "priority must be low, medium or high")
   }
 
-  if (data.due_date !== undefined && !hasValidDate(data.due_date)) {
-    throw new AppError(400, "due_date must be a valid date string")
+  if (data.dueDate !== undefined && !hasValidDate(data.dueDate)) {
+    throw new AppError(400, "dueDate must be a valid date string")
+  }
+  if (data.projectId !== undefined && data.projectId !== null && !hasValidProjectId(data.projectId)) {
+    throw new AppError(400, "projectId must be a positive integer or null")
   }
 
   return {
@@ -110,6 +143,7 @@ export function validateUpdateTaskPayload(payload: unknown): UpdateTaskDTO {
     description: data.description?.trim(),
     status: data.status,
     priority: data.priority,
-    dueDate: data.due_date,
+    dueDate: data.dueDate,
+    projectId: data.projectId,
   }
 }

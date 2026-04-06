@@ -12,7 +12,7 @@
 - `src/modules/tasks/validators` -> validacao de payload e params
 - `src/modules/tasks/services` -> regras de negocio da feature
 - `src/modules/tasks/repositories` -> acesso ao banco (SQL)
-- `src/modules/tasks/mappers` -> mapeamento entre entity/dto/api model
+- `src/modules/tasks/mappers` -> mapeamento entre entity (snake_case) e dto (camelCase)
 - `src/modules/tasks/types` -> contratos internos da feature
 - `src/shared/http` -> erro de aplicacao e middleware global
 - `src/database` -> conexao e scripts SQL versionados
@@ -44,10 +44,15 @@ Uso no DBeaver:
 - `POST /tasks`
 - `PUT /tasks/:id`
 - `DELETE /tasks/:id`
+- `GET /projects`
+- `POST /projects`
+- `PUT /projects/:id`
+- `DELETE /projects/:id`
 
 ## Contrato de Tasks
 
-Respostas de tasks usam `due_date` (snake_case).
+API HTTP de tasks usa `camelCase`.
+`snake_case` e mantido apenas na camada de persistencia (banco/repositorio).
 
 Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
 
@@ -57,7 +62,29 @@ Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
   "description": "Definir backlog da proxima sprint",
   "status": "todo",
   "priority": "high",
-  "due_date": "2026-04-10"
+  "dueDate": "2026-04-10",
+  "projectId": 1
+}
+```
+
+`projectId` e opcional e aceita `null`.
+
+## Contrato de Projects
+
+API HTTP de projects usa `camelCase`.
+`snake_case` e mantido apenas na camada de persistencia (banco/repositorio).
+
+Payload de escrita para `POST /projects` e `PUT /projects/:id`:
+
+```json
+{
+  "name": "Redesign do Site",
+  "description": "Atualizar identidade visual e UX",
+  "status": "em-andamento",
+  "deadline": "2026-04-20",
+  "progress": 65,
+  "tasksCompleted": 18,
+  "totalTasks": 28
 }
 ```
 

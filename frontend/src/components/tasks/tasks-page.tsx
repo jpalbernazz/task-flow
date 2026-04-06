@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Filter, LayoutGrid, List, Plus } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,8 @@ import {
   type UpdateTaskInput,
   updateTask,
 } from "@/services/task-service"
+import { getProjectCards } from "@/services/project-service"
+import type { ProjectCardItem } from "@/lib/projects/types"
 import type { KanbanColumnData, TaskStatus, TaskViewModel } from "@/lib/tasks/types"
 import { KanbanBoard } from "./kanban-board"
 
@@ -32,7 +34,39 @@ function buildDefaultTaskInput(totalTasks: number): CreateTaskInput {
     status: "todo",
     priority: "medium",
     dueDate,
+    projectId: null,
   }
+}
+
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
+  if (error instanceof Error && error.message.trim() !== "") {
+    return error.message
+  }
+
+  return fallbackMessage
+}
+
+function parseProjectIdPrompt(value: string, fallback: number | null): number | null {
+  const normalizedValue = value.trim()
+  if (normalizedValue === "") {
+    return null
+  }
+
+  const projectId = Number(normalizedValue)
+  if (!Number.isInteger(projectId) || projectId <= 0) {
+    return fallback
+  }
+
+  return projectId
+}
+
+function buildProjectSelectionMessage(projects: ProjectCardItem[]): string {
+  if (projects.length === 0) {
+    return "Projeto ID (deixe vazio para sem projeto)"
+  }
+
+  const options = projects.map((project) => `${project.id} - ${project.name}`).join("\n")
+  return `Projeto ID (deixe vazio para sem projeto)\n${options}`
 }
 
 function buildKanbanColumns(tasks: TaskViewModel[]): KanbanColumnData[] {
@@ -47,26 +81,21 @@ interface TasksPageViewProps {
   initialError?: string | null
 }
 
-function getErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (error instanceof Error && error.message.trim() !== "") {
-    return error.message
-  }
-
-  return fallbackMessage
-}
-
 export function TasksPageView({ initialTasks, initialError = null }: TasksPageViewProps) {
   const [tasks, setTasks] = useState<TaskViewModel[]>(initialTasks)
+  const [projects, setProjects] = useState<ProjectCardItem[]>([])
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState("all")
   const [errorMessage, setErrorMessage] = useState<string | null>(initialError)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const refreshTasks = useCallback(async () => {
+  const refreshData = useCallback(async () => {
     setIsRefreshing(true)
 
     try {
-      const taskList = await getTasks()
+      const [taskList, projectList] = await Promise.all([getTasks(), getProjectCards()])
       setTasks(taskList)
+      setProjects(projectList)
       setErrorMessage(null)
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar as tarefas."))
@@ -75,17 +104,52 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
     }
   }, [])
 
-  const columns = useMemo(() => buildKanbanColumns(tasks), [tasks])
+  useEffect(() => {
+    void refreshData()
+  }, [refreshData])
+
+  const projectsById = useMemo(() => {
+    return projects.reduce<Record<number, ProjectCardItem>>((accumulator, project) => {
+      accumulator[project.id] = project
+      return accumulator
+    }, {})
+  }, [projects])
+
+  const filteredTasks = useMemo(() => {
+    if (selectedProjectFilter === "all") {
+      return tasks
+    }
+
+    const projectId = Number(selectedProjectFilter)
+    if (!Number.isInteger(projectId)) {
+      return tasks
+    }
+
+    return tasks.filter((task) => task.projectId === projectId)
+  }, [selectedProjectFilter, tasks])
+
+  const columns = useMemo(() => buildKanbanColumns(filteredTasks), [filteredTasks])
 
   const handleCreateTask = useCallback(async () => {
+    const baseInput = buildDefaultTaskInput(tasks.length)
+    const projectPrompt = window.prompt(buildProjectSelectionMessage(projects), "")
+    if (projectPrompt === null) {
+      return
+    }
+
+    const input: CreateTaskInput = {
+      ...baseInput,
+      projectId: parseProjectIdPrompt(projectPrompt, null),
+    }
+
     try {
-      await createTask(buildDefaultTaskInput(tasks.length))
+      await createTask(input)
       setInfoMessage("Tarefa criada com sucesso.")
-      await refreshTasks()
+      await refreshData()
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Nao foi possivel criar a tarefa."))
     }
-  }, [tasks.length, refreshTasks])
+  }, [projects, refreshData, tasks.length])
 
   const handleMoveTask = useCallback(
     async (taskId: number, status: TaskStatus) => {
@@ -96,12 +160,12 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           return
         }
 
-        await refreshTasks()
+        await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel atualizar o status da tarefa."))
       }
     },
-    [refreshTasks]
+    [refreshData]
   )
 
   const handleDeleteTask = useCallback(
@@ -113,12 +177,12 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           return
         }
 
-        await refreshTasks()
+        await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
       }
     },
-    [refreshTasks]
+    [refreshData]
   )
 
   const handleEditTask = useCallback(
@@ -133,9 +197,16 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
         return
       }
 
+      const currentProjectId = task.projectId === null ? "" : String(task.projectId)
+      const projectPrompt = window.prompt(buildProjectSelectionMessage(projects), currentProjectId)
+      if (projectPrompt === null) {
+        return
+      }
+
       const payload: UpdateTaskInput = {
         title: editedTitle.trim() || task.title,
         description: editedDescription.trim() || task.description,
+        projectId: parseProjectIdPrompt(projectPrompt, task.projectId),
       }
 
       try {
@@ -146,12 +217,12 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
         }
 
         setInfoMessage("Tarefa atualizada com sucesso.")
-        await refreshTasks()
+        await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel editar a tarefa."))
       }
     },
-    [refreshTasks]
+    [projects, refreshData]
   )
 
   return (
@@ -161,7 +232,7 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span>{errorMessage}</span>
-              <Button size="sm" variant="outline" onClick={() => void refreshTasks()} disabled={isRefreshing}>
+              <Button size="sm" variant="outline" onClick={() => void refreshData()} disabled={isRefreshing}>
                 Tentar novamente
               </Button>
             </div>
@@ -195,10 +266,21 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
               </Button>
             </div>
 
-            <Button variant="outline" size="sm">
-              <Filter className="mr-2 h-4 w-4" />
-              Filtrar
-            </Button>
+            <div className="flex h-9 items-center gap-2 rounded-md border border-input px-2 text-sm">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <select
+                className="bg-transparent text-sm outline-none"
+                value={selectedProjectFilter}
+                onChange={(event) => setSelectedProjectFilter(event.target.value)}
+              >
+                <option value="all">Todos os projetos</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={String(project.id)}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <Button size="sm" onClick={() => void handleCreateTask()}>
               <Plus className="mr-2 h-4 w-4" />
@@ -212,6 +294,13 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           onMoveTask={handleMoveTask}
           onDeleteTask={handleDeleteTask}
           onEditTask={handleEditTask}
+          getProjectName={(projectId) => {
+            if (projectId === null) {
+              return null
+            }
+
+            return projectsById[projectId]?.name ?? null
+          }}
         />
       </div>
     </DashboardLayout>

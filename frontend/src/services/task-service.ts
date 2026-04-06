@@ -1,7 +1,5 @@
-import { taskApiModelToViewModel } from "@/lib/tasks/task-mapper"
 import type {
   KanbanColumnData,
-  TaskApiModel,
   TaskPriority,
   TaskStatus,
   TaskViewModel,
@@ -24,7 +22,8 @@ interface TaskWritePayload {
   description: string
   status: TaskStatus
   priority: TaskPriority
-  due_date: string
+  dueDate: string
+  projectId: number | null
 }
 
 function toTaskWritePayload(input: CreateTaskInput): TaskWritePayload {
@@ -33,7 +32,8 @@ function toTaskWritePayload(input: CreateTaskInput): TaskWritePayload {
     description: input.description,
     status: input.status,
     priority: input.priority,
-    due_date: input.dueDate,
+    dueDate: input.dueDate,
+    projectId: input.projectId ?? null,
   }
 }
 
@@ -53,7 +53,10 @@ function toTaskUpdatePayload(input: UpdateTaskInput): Partial<TaskWritePayload> 
     payload.priority = input.priority
   }
   if (input.dueDate !== undefined) {
-    payload.due_date = input.dueDate
+    payload.dueDate = input.dueDate
+  }
+  if (input.projectId !== undefined) {
+    payload.projectId = input.projectId
   }
 
   return payload
@@ -88,8 +91,7 @@ export async function getTasks(): Promise<TaskViewModel[]> {
     await throwApiError(response, "failed to fetch tasks")
   }
 
-  const taskApiModels = (await response.json()) as TaskApiModel[]
-  return taskApiModels.map(taskApiModelToViewModel)
+  return (await response.json()) as TaskViewModel[]
 }
 
 export async function createTask(input: CreateTaskInput): Promise<TaskViewModel> {
@@ -102,8 +104,7 @@ export async function createTask(input: CreateTaskInput): Promise<TaskViewModel>
     await throwApiError(response, "failed to create task")
   }
 
-  const taskApiModel = (await response.json()) as TaskApiModel
-  return taskApiModelToViewModel(taskApiModel)
+  return (await response.json()) as TaskViewModel
 }
 
 export async function updateTask(id: number, input: UpdateTaskInput): Promise<TaskViewModel | null> {
@@ -120,8 +121,7 @@ export async function updateTask(id: number, input: UpdateTaskInput): Promise<Ta
     await throwApiError(response, "failed to update task")
   }
 
-  const taskApiModel = (await response.json()) as TaskApiModel
-  return taskApiModelToViewModel(taskApiModel)
+  return (await response.json()) as TaskViewModel
 }
 
 export async function deleteTask(id: number): Promise<boolean> {

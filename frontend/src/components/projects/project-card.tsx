@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils"
 
 interface ProjectCardProps {
   project: ProjectCardItem
+  onEditProject?: (project: ProjectCardItem) => Promise<void> | void
 }
 
 const statusConfig = {
@@ -39,18 +40,23 @@ const statusConfig = {
 }
 
 function formatDate(date: string): string {
-  const months = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
-  const parts = date.split("-")
-  if (parts.length !== 3) return date
+  const hasDateOnlyFormat = /^\d{4}-\d{2}-\d{2}$/.test(date)
+  const normalizedDate = hasDateOnlyFormat ? `${date}T00:00:00Z` : date
+  const parsedDate = new Date(normalizedDate)
 
-  const year = parseInt(parts[0], 10)
-  const month = parseInt(parts[1], 10)
-  const day = parseInt(parts[2], 10)
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date
+  }
 
-  return `${day} de ${months[month - 1]} de ${year}`
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(parsedDate)
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, onEditProject }: ProjectCardProps) {
   const status = statusConfig[project.status]
   const maxVisibleMembers = 3
   const extraMembers = project.members.length - maxVisibleMembers
@@ -76,7 +82,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-              <DropdownMenuItem>Editar projeto</DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault()
+                  void onEditProject?.(project)
+                }}
+              >
+                Editar projeto
+              </DropdownMenuItem>
               <DropdownMenuItem>Gerenciar equipe</DropdownMenuItem>
               <DropdownMenuItem className="text-destructive">Excluir projeto</DropdownMenuItem>
             </DropdownMenuContent>

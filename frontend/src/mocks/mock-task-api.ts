@@ -1,13 +1,14 @@
-import type { TaskApiModel } from "@/lib/tasks/types"
+import type { TaskViewModel } from "@/lib/tasks/types"
 
-export const mockTaskApi: TaskApiModel[] = [
+export const mockTaskApi: TaskViewModel[] = [
   {
     id: 1,
     title: "Mapear jornadas de usuario",
     description: "Documentar os fluxos principais para o novo dashboard.",
     status: "todo",
     priority: "high",
-    due_date: "2026-04-12",
+    dueDate: "2026-04-12",
+    projectId: null,
   },
   {
     id: 2,
@@ -15,7 +16,8 @@ export const mockTaskApi: TaskApiModel[] = [
     description: "Prototipo de baixa fidelidade da pagina inicial.",
     status: "in_progress",
     priority: "medium",
-    due_date: "2026-04-09",
+    dueDate: "2026-04-09",
+    projectId: null,
   },
   {
     id: 3,
@@ -23,6 +25,7 @@ export const mockTaskApi: TaskApiModel[] = [
     description: "Validar contraste e acessibilidade do tema.",
     status: "done",
     priority: "low",
-    due_date: "2026-04-05",
+    dueDate: "2026-04-05",
+    projectId: null,
   },
 ]

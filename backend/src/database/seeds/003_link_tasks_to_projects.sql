@@ -1,0 +1,7 @@
+UPDATE tasks
+SET project_id = CASE id
+  WHEN 1 THEN 1
+  WHEN 2 THEN 1
+  WHEN 3 THEN 2
+  ELSE NULL
+END;

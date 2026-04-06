@@ -11,11 +11,21 @@ interface KanbanColumnProps {
   onMoveTask: (taskId: number, status: TaskStatus) => Promise<void>
   onDeleteTask: (taskId: number) => Promise<void>
   onEditTask: (task: TaskViewModel) => Promise<void>
+  getProjectName: (projectId: number | null) => string | null
 }
 
 const TASK_ID_TRANSFER_TYPE = "text/task-id"
 
-export function KanbanColumn({ id, title, color, tasks, onMoveTask, onDeleteTask, onEditTask }: KanbanColumnProps) {
+export function KanbanColumn({
+  id,
+  title,
+  color,
+  tasks,
+  onMoveTask,
+  onDeleteTask,
+  onEditTask,
+  getProjectName,
+}: KanbanColumnProps) {
   const handleDragOver = (event: DragEvent<HTMLElement>) => {
     event.preventDefault()
   }
@@ -59,6 +69,7 @@ export function KanbanColumn({ id, title, color, tasks, onMoveTask, onDeleteTask
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}
               dragDataTransferType={TASK_ID_TRANSFER_TYPE}
+              projectName={getProjectName(task.projectId)}
             />
           ))
         )}

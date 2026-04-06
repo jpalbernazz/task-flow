@@ -1,15 +1,6 @@
 export type TaskStatus = "todo" | "in_progress" | "done"
 export type TaskPriority = "low" | "medium" | "high"
 
-export interface TaskApiModel {
-  id: number
-  title: string
-  description: string
-  status: TaskStatus
-  priority: TaskPriority
-  due_date: string
-}
-
 export interface TaskViewModel {
   id: number
   title: string
@@ -17,6 +8,7 @@ export interface TaskViewModel {
   status: TaskStatus
   priority: TaskPriority
   dueDate: string
+  projectId: number | null
 }
 
 export interface KanbanColumnData {

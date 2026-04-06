@@ -3,12 +3,16 @@ import fs from "node:fs/promises"
 import path from "node:path"
 import { Pool } from "pg"
 
+const host = process.env.PGHOST ?? "localhost"
+const isLocalDatabase = host === "localhost" || host === "127.0.0.1"
+
 const pool = new Pool({
-  host: process.env.PGHOST ?? "localhost",
+  host,
   port: Number(process.env.PGPORT ?? 5432),
   database: process.env.PGDATABASE ?? "task_flow",
   user: process.env.PGUSER ?? "postgres",
   password: process.env.PGPASSWORD ?? "postgres",
+  ssl: isLocalDatabase ? undefined : { rejectUnauthorized: false },
 })
 
 async function resolveSqlFiles(inputPath) {

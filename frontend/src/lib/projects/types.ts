@@ -3,8 +3,21 @@ export interface ProjectMember {
   avatar: string
 }
 
+export type ProjectStatus = "planejado" | "em-andamento" | "concluido" | "atrasado"
+
+export interface ProjectApiModel {
+  id: number
+  name: string
+  description: string
+  status: ProjectStatus
+  deadline: string
+  progress: number
+  tasksCompleted: number
+  totalTasks: number
+}
+
 export interface ProjectCardItem {
-  id: string
+  id: number
   name: string
   description: string
   members: ProjectMember[]
@@ -12,5 +25,5 @@ export interface ProjectCardItem {
   progress: number
   tasksCompleted: number
   totalTasks: number
-  status: "planejado" | "em-andamento" | "concluido" | "atrasado"
+  status: ProjectStatus
 }

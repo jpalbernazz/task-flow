@@ -10,6 +10,7 @@ interface TaskCardProps {
   onDeleteTask: (taskId: number) => Promise<void>
   onEditTask: (task: TaskViewModel) => Promise<void>
   dragDataTransferType: string
+  projectName: string | null
 }
 
 const priorityStyleByLevel = {
@@ -39,7 +40,7 @@ function formatShortDate(dateString: string) {
   return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(parsedDate)
 }
 
-export function TaskCard({ task, onDeleteTask, onEditTask, dragDataTransferType }: TaskCardProps) {
+export function TaskCard({ task, onDeleteTask, onEditTask, dragDataTransferType, projectName }: TaskCardProps) {
   const priority = priorityStyleByLevel[task.priority]
   const handleDragStart = (event: DragEvent<HTMLElement>) => {
     event.dataTransfer.setData(dragDataTransferType, String(task.id))
@@ -69,6 +70,12 @@ export function TaskCard({ task, onDeleteTask, onEditTask, dragDataTransferType 
     >
       <CardContent className="space-y-3 p-4">
         <h4 className="line-clamp-2 text-sm font-medium text-foreground">{task.title}</h4>
+
+        {projectName ? (
+          <Badge variant="outline" className="text-xs">
+            {projectName}
+          </Badge>
+        ) : null}
 
         <div className="flex items-center justify-between gap-2">
           <Badge variant="secondary" className={cn("text-xs", priority.className)}>

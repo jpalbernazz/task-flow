@@ -1,6 +1,5 @@
 import type {
   CreateTaskDTO,
-  TaskApiModel,
   TaskDTO,
   TaskEntity,
   UpdateTaskDTO,
@@ -14,17 +13,7 @@ export function entityToTaskDTO(entity: TaskEntity): TaskDTO {
     status: entity.status,
     priority: entity.priority,
     dueDate: entity.due_date,
-  }
-}
-
-export function taskDTOToApiModel(task: TaskDTO): TaskApiModel {
-  return {
-    id: task.id,
-    title: task.title,
-    description: task.description,
-    status: task.status,
-    priority: task.priority,
-    due_date: task.dueDate,
+    projectId: entity.project_id,
   }
 }
 
@@ -35,6 +24,7 @@ export function createTaskDTOToEntityInput(input: CreateTaskDTO): Omit<TaskEntit
     status: input.status,
     priority: input.priority,
     due_date: input.dueDate,
+    project_id: input.projectId ?? null,
   }
 }
 
@@ -55,6 +45,9 @@ export function updateTaskDTOToEntityInput(input: UpdateTaskDTO): Partial<Omit<T
   }
   if (input.dueDate !== undefined) {
     result.due_date = input.dueDate
+  }
+  if (input.projectId !== undefined) {
+    result.project_id = input.projectId
   }
 
   return result

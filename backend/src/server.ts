@@ -2,6 +2,7 @@ import "dotenv/config"
 import express from "express"
 import cors from "cors"
 import tasksRoutes from "./modules/tasks/routes/tasks-routes"
+import projectsRoutes from "./modules/projects/routes/projects-routes"
 import { errorHandler } from "./shared/http/error-handler"
 
 const app = express()
@@ -15,6 +16,7 @@ app.get("/health", (_req, res) => {
 })
 
 app.use(tasksRoutes)
+app.use(projectsRoutes)
 
 app.use(errorHandler)
 

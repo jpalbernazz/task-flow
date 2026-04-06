@@ -8,6 +8,7 @@ export interface TaskEntity {
   status: TaskStatus
   priority: TaskPriority
   due_date: string
+  project_id: number | null
 }
 
 export interface TaskDTO {
@@ -17,15 +18,7 @@ export interface TaskDTO {
   status: TaskStatus
   priority: TaskPriority
   dueDate: string
-}
-
-export interface TaskApiModel {
-  id: number
-  title: string
-  description: string
-  status: TaskStatus
-  priority: TaskPriority
-  due_date: string
+  projectId: number | null
 }
 
 export interface CreateTaskDTO {
@@ -34,6 +27,7 @@ export interface CreateTaskDTO {
   status: TaskStatus
   priority: TaskPriority
   dueDate: string
+  projectId?: number | null
 }
 
 export interface UpdateTaskDTO {
@@ -42,20 +36,5 @@ export interface UpdateTaskDTO {
   status?: TaskStatus
   priority?: TaskPriority
   dueDate?: string
-}
-
-export interface CreateTaskApiInput {
-  title: string
-  description: string
-  status: TaskStatus
-  priority: TaskPriority
-  due_date: string
-}
-
-export interface UpdateTaskApiInput {
-  title?: string
-  description?: string
-  status?: TaskStatus
-  priority?: TaskPriority
-  due_date?: string
+  projectId?: number | null
 }

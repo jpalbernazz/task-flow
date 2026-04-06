@@ -1,13 +1,12 @@
 import { mockProjects } from "@/mocks/projects"
 import { mockTaskApi } from "@/mocks/mock-task-api"
 import { mockUsers } from "@/mocks/users"
-import { taskApiModelToViewModel } from "@/lib/tasks/task-mapper"
 import type { Project, User } from "@/lib/models/task-management"
 import type { TaskStatus } from "@/lib/tasks/types"
 
 export { mockProjects, mockTaskApi, mockUsers }
 
-export const mockTasks = mockTaskApi.map(taskApiModelToViewModel)
+export const mockTasks = mockTaskApi
 
 export const mockData = {
   users: mockUsers,
