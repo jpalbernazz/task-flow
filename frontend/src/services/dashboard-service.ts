@@ -1,74 +1,29 @@
 import type { DashboardStat, RecentTaskItem } from "@/lib/dashboard/types"
+import { buildDashboardStats, buildRecentTasks, getTodayDateKey } from "@/lib/dashboard/dashboard-utils"
+import { getProjectCards } from "@/services/project-service"
+import { getTasks } from "@/services/task-service"
 
-const dashboardStats: DashboardStat[] = [
-  {
-    title: "Total de Tarefas",
-    value: 42,
-    description: "Todas as tarefas ativas",
-    icon: "list",
-    variant: "primary",
-    trend: { value: 12, isPositive: true },
-  },
-  {
-    title: "Em Progresso",
-    value: 18,
-    description: "Tarefas em andamento",
-    icon: "clock",
-    variant: "primary",
-    trend: { value: 8, isPositive: true },
-  },
-  {
-    title: "Concluidas",
-    value: 156,
-    description: "Este mes",
-    icon: "check",
-    variant: "success",
-    trend: { value: 24, isPositive: true },
-  },
-  {
-    title: "Atrasadas",
-    value: 3,
-    description: "Requerem atencao",
-    icon: "alert",
-    variant: "destructive",
-    trend: { value: 2, isPositive: false },
-  },
-]
-
-const recentTasks: RecentTaskItem[] = [
-  {
-    id: "1",
-    title: "Criar wireframes da pagina inicial",
-    project: "Redesign do Site",
-    status: "in-progress",
-    priority: "high",
-    dueDate: "Hoje",
-    assignee: { name: "Maria Silva", initials: "MS" },
-  },
-  {
-    id: "2",
-    title: "Revisar documentacao da API",
-    project: "API de Backend",
-    status: "todo",
-    priority: "medium",
-    dueDate: "Amanha",
-    assignee: { name: "Pedro Santos", initials: "PS" },
-  },
-  {
-    id: "3",
-    title: "Implementar autenticacao OAuth",
-    project: "Aplicativo Mobile",
-    status: "overdue",
-    priority: "high",
-    dueDate: "Ontem",
-    assignee: { name: "Ana Costa", initials: "AC" },
-  },
-]
-
-export function getDashboardStats(): DashboardStat[] {
-  return dashboardStats
+interface DashboardData {
+  stats: DashboardStat[]
+  recentTasks: RecentTaskItem[]
 }
 
-export function getRecentTasks(): RecentTaskItem[] {
-  return recentTasks
+export async function getDashboardData(): Promise<DashboardData> {
+  const [tasks, projects] = await Promise.all([getTasks(), getProjectCards()])
+  const todayDateKey = getTodayDateKey()
+
+  return {
+    stats: buildDashboardStats(tasks, projects, todayDateKey),
+    recentTasks: buildRecentTasks(tasks, projects, todayDateKey),
+  }
+}
+
+export async function getDashboardStats(): Promise<DashboardStat[]> {
+  const data = await getDashboardData()
+  return data.stats
+}
+
+export async function getRecentTasks(): Promise<RecentTaskItem[]> {
+  const data = await getDashboardData()
+  return data.recentTasks
 }

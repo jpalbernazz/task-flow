@@ -19,9 +19,9 @@ export interface DashboardStat {
   title: string
   value: number
   description: string
-  icon: "list" | "clock" | "check" | "alert"
+  icon: "list" | "clock" | "check" | "alert" | "folder"
   variant: "primary" | "success" | "destructive"
-  trend: {
+  trend?: {
     value: number
     isPositive: boolean
   }

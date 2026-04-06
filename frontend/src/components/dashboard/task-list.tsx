@@ -60,16 +60,18 @@ export function TaskList({ tasks }: TaskListProps) {
     <div className="rounded-xl border border-border bg-card shadow-sm">
       <div className="flex items-center justify-between border-b border-border p-4 md:p-6">
         <div>
-          <h2 className="text-lg font-semibold text-card-foreground">Tarefas Recentes</h2>
-          <p className="text-sm text-muted-foreground">Suas tarefas mais recentes e seus status</p>
+          <h2 className="text-lg font-semibold text-card-foreground">Tarefas Relevantes</h2>
+          <p className="text-sm text-muted-foreground">Tarefas priorizadas por prazo e status</p>
         </div>
-        <Button variant="outline" size="sm">Ver todas</Button>
+        <Button variant="outline" size="sm" disabled>Ver todas</Button>
       </div>
 
       <div className="divide-y divide-border">
-        {tasks.map((task) => (
-          <TaskRow key={task.id} task={task} />
-        ))}
+        {tasks.length === 0 ? (
+          <div className="p-6 text-sm text-muted-foreground">Nenhuma tarefa relevante encontrada no momento.</div>
+        ) : (
+          tasks.map((task) => <TaskRow key={task.id} task={task} />)
+        )}
       </div>
     </div>
   )
