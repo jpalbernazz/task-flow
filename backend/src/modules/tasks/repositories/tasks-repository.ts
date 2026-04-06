@@ -7,6 +7,7 @@ export async function findAllTasks(): Promise<TaskEntity[]> {
     `
       SELECT id, title, description, status, priority, due_date, project_id
       FROM tasks
+      WHERE deleted_at IS NULL
       ORDER BY id ASC
     `
   )
@@ -20,6 +21,7 @@ export async function findTaskById(id: number): Promise<TaskEntity | null> {
       SELECT id, title, description, status, priority, due_date, project_id
       FROM tasks
       WHERE id = $1
+        AND deleted_at IS NULL
     `,
     [id]
   )
@@ -49,8 +51,10 @@ export async function updateTask(id: number, input: Omit<TaskEntity, "id">): Pro
           status = $3,
           priority = $4,
           due_date = $5,
-          project_id = $6
+          project_id = $6,
+          updated_at = NOW()
       WHERE id = $7
+        AND deleted_at IS NULL
       RETURNING id, title, description, status, priority, due_date, project_id
     `,
     [input.title, input.description, input.status, input.priority, input.due_date, input.project_id, id]
@@ -60,6 +64,16 @@ export async function updateTask(id: number, input: Omit<TaskEntity, "id">): Pro
 }
 
 export async function deleteTask(id: number): Promise<boolean> {
-  const result = await pool.query("DELETE FROM tasks WHERE id = $1", [id])
+  const result = await pool.query(
+    `
+      UPDATE tasks
+      SET deleted_at = NOW(),
+          updated_at = NOW()
+      WHERE id = $1
+        AND deleted_at IS NULL
+    `,
+    [id]
+  )
+
   return result.rowCount === 1
 }

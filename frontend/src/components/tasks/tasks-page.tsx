@@ -1,9 +1,21 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { Filter, LayoutGrid, List, Plus } from "lucide-react"
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
-import { Button } from "@/components/ui/button"
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Filter, Plus } from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { Button } from "@/components/ui/button";
+import {
+  Combobox,
+  ComboboxCollection,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  useComboboxAnchor,
+} from "@/components/ui/combobox";
+import { InputGroupAddon } from "@/components/ui/input-group";
+import { TaskDetailsModal, type TaskModalMode } from "./task-details-modal";
 import {
   createTask,
   deleteTask,
@@ -11,219 +23,263 @@ import {
   type CreateTaskInput,
   type UpdateTaskInput,
   updateTask,
-} from "@/services/task-service"
-import { getProjectCards } from "@/services/project-service"
-import type { ProjectCardItem } from "@/lib/projects/types"
-import type { KanbanColumnData, TaskStatus, TaskViewModel } from "@/lib/tasks/types"
-import { KanbanBoard } from "./kanban-board"
+} from "@/services/task-service";
+import { getProjectCards } from "@/services/project-service";
+import type { ProjectCardItem } from "@/lib/projects/types";
+import type {
+  KanbanColumnData,
+  TaskStatus,
+  TaskViewModel,
+} from "@/lib/tasks/types";
+import { KanbanBoard } from "./kanban-board";
 
 const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
   { id: "todo", title: "A Fazer", color: "bg-muted-foreground/70" },
   { id: "in_progress", title: "Em Progresso", color: "bg-primary" },
   { id: "done", title: "Concluida", color: "bg-success" },
-]
-
-function buildDefaultTaskInput(totalTasks: number): CreateTaskInput {
-  const nextDay = new Date()
-  nextDay.setDate(nextDay.getDate() + 1)
-  const dueDate = nextDay.toISOString().slice(0, 10)
-
-  return {
-    title: `Nova tarefa ${totalTasks + 1}`,
-    description: "Descricao da nova tarefa",
-    status: "todo",
-    priority: "medium",
-    dueDate,
-    projectId: null,
-  }
-}
+];
 
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
   if (error instanceof Error && error.message.trim() !== "") {
-    return error.message
+    return error.message;
   }
 
-  return fallbackMessage
-}
-
-function parseProjectIdPrompt(value: string, fallback: number | null): number | null {
-  const normalizedValue = value.trim()
-  if (normalizedValue === "") {
-    return null
-  }
-
-  const projectId = Number(normalizedValue)
-  if (!Number.isInteger(projectId) || projectId <= 0) {
-    return fallback
-  }
-
-  return projectId
-}
-
-function buildProjectSelectionMessage(projects: ProjectCardItem[]): string {
-  if (projects.length === 0) {
-    return "Projeto ID (deixe vazio para sem projeto)"
-  }
-
-  const options = projects.map((project) => `${project.id} - ${project.name}`).join("\n")
-  return `Projeto ID (deixe vazio para sem projeto)\n${options}`
+  return fallbackMessage;
 }
 
 function buildKanbanColumns(tasks: TaskViewModel[]): KanbanColumnData[] {
   return baseColumns.map((column) => ({
     ...column,
     tasks: tasks.filter((task) => task.status === column.id),
-  }))
+  }));
 }
 
 interface TasksPageViewProps {
-  initialTasks: TaskViewModel[]
-  initialError?: string | null
+  initialTasks: TaskViewModel[];
+  initialError?: string | null;
 }
 
-export function TasksPageView({ initialTasks, initialError = null }: TasksPageViewProps) {
-  const [tasks, setTasks] = useState<TaskViewModel[]>(initialTasks)
-  const [projects, setProjects] = useState<ProjectCardItem[]>([])
-  const [selectedProjectFilter, setSelectedProjectFilter] = useState("all")
-  const [errorMessage, setErrorMessage] = useState<string | null>(initialError)
-  const [infoMessage, setInfoMessage] = useState<string | null>(null)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+interface ProjectFilterOption {
+  value: string;
+  label: string;
+}
+
+export function TasksPageView({
+  initialTasks,
+  initialError = null,
+}: TasksPageViewProps) {
+  const [tasks, setTasks] = useState<TaskViewModel[]>(initialTasks);
+  const [projects, setProjects] = useState<ProjectCardItem[]>([]);
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState("all");
+  const [errorMessage, setErrorMessage] = useState<string | null>(initialError);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskModalMode, setTaskModalMode] = useState<TaskModalMode>("create");
+  const [selectedTask, setSelectedTask] = useState<TaskViewModel | null>(null);
+  const projectFilterAnchor = useComboboxAnchor();
 
   const refreshData = useCallback(async () => {
-    setIsRefreshing(true)
+    setIsRefreshing(true);
 
     try {
-      const [taskList, projectList] = await Promise.all([getTasks(), getProjectCards()])
-      setTasks(taskList)
-      setProjects(projectList)
-      setErrorMessage(null)
+      const [taskList, projectList] = await Promise.all([
+        getTasks(),
+        getProjectCards(),
+      ]);
+      setTasks(taskList);
+      setProjects(projectList);
+      setErrorMessage(null);
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar as tarefas."))
+      setErrorMessage(
+        getErrorMessage(error, "Nao foi possivel carregar as tarefas."),
+      );
     } finally {
-      setIsRefreshing(false)
+      setIsRefreshing(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    void refreshData()
-  }, [refreshData])
+    void refreshData();
+  }, [refreshData]);
 
   const projectsById = useMemo(() => {
-    return projects.reduce<Record<number, ProjectCardItem>>((accumulator, project) => {
-      accumulator[project.id] = project
-      return accumulator
-    }, {})
-  }, [projects])
+    return projects.reduce<Record<number, ProjectCardItem>>(
+      (accumulator, project) => {
+        accumulator[project.id] = project;
+        return accumulator;
+      },
+      {},
+    );
+  }, [projects]);
 
   const filteredTasks = useMemo(() => {
     if (selectedProjectFilter === "all") {
-      return tasks
+      return tasks;
     }
 
-    const projectId = Number(selectedProjectFilter)
+    const projectId = Number(selectedProjectFilter);
     if (!Number.isInteger(projectId)) {
-      return tasks
+      return tasks;
     }
 
-    return tasks.filter((task) => task.projectId === projectId)
-  }, [selectedProjectFilter, tasks])
+    return tasks.filter((task) => task.projectId === projectId);
+  }, [selectedProjectFilter, tasks]);
 
-  const columns = useMemo(() => buildKanbanColumns(filteredTasks), [filteredTasks])
+  const columns = useMemo(
+    () => buildKanbanColumns(filteredTasks),
+    [filteredTasks],
+  );
+  const projectFilterOptions = useMemo<ProjectFilterOption[]>(() => {
+    return [
+      { value: "all", label: "Todos os projetos" },
+      ...projects.map((project) => ({
+        value: String(project.id),
+        label: project.name,
+      })),
+    ];
+  }, [projects]);
 
-  const handleCreateTask = useCallback(async () => {
-    const baseInput = buildDefaultTaskInput(tasks.length)
-    const projectPrompt = window.prompt(buildProjectSelectionMessage(projects), "")
-    if (projectPrompt === null) {
-      return
-    }
+  const selectedProjectOption = useMemo<ProjectFilterOption>(() => {
+    return (
+      projectFilterOptions.find(
+        (option) => option.value === selectedProjectFilter,
+      ) ?? projectFilterOptions[0]
+    );
+  }, [projectFilterOptions, selectedProjectFilter]);
 
-    const input: CreateTaskInput = {
-      ...baseInput,
-      projectId: parseProjectIdPrompt(projectPrompt, null),
-    }
-
-    try {
-      await createTask(input)
-      setInfoMessage("Tarefa criada com sucesso.")
-      await refreshData()
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Nao foi possivel criar a tarefa."))
-    }
-  }, [projects, refreshData, tasks.length])
+  const handleCreateTask = useCallback(
+    async (input: CreateTaskInput) => {
+      try {
+        await createTask(input);
+        setInfoMessage("Tarefa criada com sucesso.");
+        setErrorMessage(null);
+        await refreshData();
+      } catch (error) {
+        setErrorMessage(
+          getErrorMessage(error, "Nao foi possivel criar a tarefa."),
+        );
+        throw error;
+      }
+    },
+    [refreshData],
+  );
 
   const handleMoveTask = useCallback(
     async (taskId: number, status: TaskStatus) => {
       try {
-        const updatedTask = await updateTask(taskId, { status })
+        const updatedTask = await updateTask(taskId, { status });
         if (!updatedTask) {
-          setErrorMessage("A tarefa nao foi encontrada para atualizar o status.")
-          return
+          setErrorMessage(
+            "A tarefa nao foi encontrada para atualizar o status.",
+          );
+          return;
         }
 
-        await refreshData()
+        await refreshData();
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel atualizar o status da tarefa."))
+        setErrorMessage(
+          getErrorMessage(
+            error,
+            "Nao foi possivel atualizar o status da tarefa.",
+          ),
+        );
       }
     },
-    [refreshData]
-  )
+    [refreshData],
+  );
 
   const handleDeleteTask = useCallback(
     async (taskId: number) => {
       try {
-        const deleted = await deleteTask(taskId)
+        const deleted = await deleteTask(taskId);
         if (!deleted) {
-          setErrorMessage("A tarefa nao foi encontrada para exclusao.")
-          return
+          setErrorMessage("A tarefa nao foi encontrada para exclusao.");
+          return;
         }
 
-        await refreshData()
+        setInfoMessage("Tarefa excluida com sucesso.");
+        setErrorMessage(null);
+        await refreshData();
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
+        setErrorMessage(
+          getErrorMessage(error, "Nao foi possivel excluir a tarefa."),
+        );
       }
     },
-    [refreshData]
-  )
+    [refreshData],
+  );
 
-  const handleEditTask = useCallback(
-    async (task: TaskViewModel) => {
-      const editedTitle = window.prompt("Editar titulo da tarefa", task.title)
-      if (editedTitle === null) {
-        return
-      }
-
-      const editedDescription = window.prompt("Editar descricao da tarefa", task.description)
-      if (editedDescription === null) {
-        return
-      }
-
-      const currentProjectId = task.projectId === null ? "" : String(task.projectId)
-      const projectPrompt = window.prompt(buildProjectSelectionMessage(projects), currentProjectId)
-      if (projectPrompt === null) {
-        return
-      }
-
-      const payload: UpdateTaskInput = {
-        title: editedTitle.trim() || task.title,
-        description: editedDescription.trim() || task.description,
-        projectId: parseProjectIdPrompt(projectPrompt, task.projectId),
-      }
-
+  const handleUpdateTask = useCallback(
+    async (taskId: number, payload: UpdateTaskInput) => {
       try {
-        const updatedTask = await updateTask(task.id, payload)
+        const updatedTask = await updateTask(taskId, payload);
         if (!updatedTask) {
-          setErrorMessage("A tarefa nao foi encontrada para edicao.")
-          return
+          const notFoundError = new Error(
+            "A tarefa nao foi encontrada para edicao.",
+          );
+          setErrorMessage(notFoundError.message);
+          throw notFoundError;
         }
 
-        setInfoMessage("Tarefa atualizada com sucesso.")
-        await refreshData()
+        setInfoMessage("Tarefa atualizada com sucesso.");
+        setErrorMessage(null);
+        await refreshData();
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel editar a tarefa."))
+        setErrorMessage(
+          getErrorMessage(error, "Nao foi possivel editar a tarefa."),
+        );
+        throw error;
       }
     },
-    [projects, refreshData]
-  )
+    [refreshData],
+  );
+
+  const handleDeleteTaskFromModal = useCallback(
+    async (taskId: number) => {
+      try {
+        const deleted = await deleteTask(taskId);
+        if (!deleted) {
+          const notFoundError = new Error(
+            "A tarefa nao foi encontrada para exclusao.",
+          );
+          setErrorMessage(notFoundError.message);
+          throw notFoundError;
+        }
+
+        setInfoMessage("Tarefa excluida com sucesso.");
+        setErrorMessage(null);
+        await refreshData();
+      } catch (error) {
+        setErrorMessage(
+          getErrorMessage(error, "Nao foi possivel excluir a tarefa."),
+        );
+        throw error;
+      }
+    },
+    [refreshData],
+  );
+
+  const handleTaskModalOpenChange = (open: boolean) => {
+    setIsTaskModalOpen(open);
+
+    if (!open) {
+      setTaskModalMode("create");
+      setSelectedTask(null);
+    }
+  };
+
+  const handleOpenCreateTaskModal = () => {
+    setTaskModalMode("create");
+    setSelectedTask(null);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleOpenEditTaskModal = (task: TaskViewModel) => {
+    setTaskModalMode("edit");
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
+  };
 
   return (
     <DashboardLayout>
@@ -232,7 +288,12 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span>{errorMessage}</span>
-              <Button size="sm" variant="outline" onClick={() => void refreshData()} disabled={isRefreshing}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void refreshData()}
+                disabled={isRefreshing}
+              >
                 Tentar novamente
               </Button>
             </div>
@@ -245,45 +306,64 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           </div>
         ) : null}
 
-        {isRefreshing ? <p className="text-sm text-muted-foreground">Atualizando tarefas...</p> : null}
+        {isRefreshing ? (
+          <p className="text-sm text-muted-foreground">
+            Atualizando tarefas...
+          </p>
+        ) : null}
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Tarefas</h1>
-            <p className="text-sm text-muted-foreground">Gerencie suas tarefas com o quadro Kanban</p>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              Tarefas
+            </h1>
+            <p className="pl-0.5 text-sm text-muted-foreground ">
+              Gerencie suas tarefas com o quadro Kanban
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center rounded-lg border border-border bg-card p-1">
-              <Button variant="ghost" size="sm" className="h-8 bg-primary/10 text-primary hover:bg-primary/20">
-                <LayoutGrid className="h-4 w-4" />
-                <span className="sr-only">Visualizacao Kanban</span>
-              </Button>
+            <Combobox
+              value={selectedProjectOption}
+              onValueChange={(value) =>
+                setSelectedProjectFilter(value?.value ?? "all")
+              }
+              items={projectFilterOptions}
+              isItemEqualToValue={(item, value) => item.value === value.value}
+            >
+              <div ref={projectFilterAnchor} className="w-fit max-w-full">
+                <ComboboxInput
+                  aria-label="Filtrar por projeto"
+                  placeholder="Todos os projetos"
+                  size={1}
+                  className="w-fit max-w-full **:data-[slot=input-group-control]:w-auto **:data-[slot=input-group-control]:field-sizing-content cursor-pointer **:data-[slot=input-group-control]:cursor-pointer **:data-[slot=input-group-addon]:cursor-pointer **:data-[slot=input-group-button]:cursor-pointer"
+                  showClear={selectedProjectFilter !== "all"}
+                >
+                  <InputGroupAddon align="inline-start">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                  </InputGroupAddon>
+                </ComboboxInput>
+              </div>
 
-              <Button variant="ghost" size="sm" className="h-8">
-                <List className="h-4 w-4" />
-                <span className="sr-only">Visualizacao Lista</span>
-              </Button>
-            </div>
-
-            <div className="flex h-9 items-center gap-2 rounded-md border border-input px-2 text-sm">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <select
-                className="bg-transparent text-sm outline-none"
-                value={selectedProjectFilter}
-                onChange={(event) => setSelectedProjectFilter(event.target.value)}
+              <ComboboxContent
+                anchor={projectFilterAnchor}
+                className="w-(--anchor-width)! min-w-(--anchor-width)! max-w-(--anchor-width)!"
               >
-                <option value="all">Todos os projetos</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={String(project.id)}>
-                    {project.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <ComboboxEmpty>Nenhum projeto encontrado.</ComboboxEmpty>
+                <ComboboxList>
+                  <ComboboxCollection>
+                    {(option: ProjectFilterOption) => (
+                      <ComboboxItem key={option.value} value={option}>
+                        {option.label}
+                      </ComboboxItem>
+                    )}
+                  </ComboboxCollection>
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
 
-            <Button size="sm" onClick={() => void handleCreateTask()}>
-              <Plus className="mr-2 h-4 w-4" />
+            <Button onClick={handleOpenCreateTaskModal}>
+              <Plus className="h-4 w-4" />
               Nova Tarefa
             </Button>
           </div>
@@ -293,18 +373,29 @@ export function TasksPageView({ initialTasks, initialError = null }: TasksPageVi
           columns={columns}
           onMoveTask={handleMoveTask}
           onDeleteTask={handleDeleteTask}
-          onEditTask={handleEditTask}
+          onOpenEditTask={handleOpenEditTaskModal}
           getProjectName={(projectId) => {
             if (projectId === null) {
-              return null
+              return null;
             }
 
-            return projectsById[projectId]?.name ?? null
+            return projectsById[projectId]?.name ?? null;
           }}
         />
       </div>
+
+      <TaskDetailsModal
+        open={isTaskModalOpen}
+        onOpenChange={handleTaskModalOpenChange}
+        mode={taskModalMode}
+        initialTask={selectedTask}
+        projects={projects}
+        onCreate={handleCreateTask}
+        onUpdate={handleUpdateTask}
+        onDelete={handleDeleteTaskFromModal}
+      />
     </DashboardLayout>
-  )
+  );
 }
 
-export default TasksPageView
+export default TasksPageView;

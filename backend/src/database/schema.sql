@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS tasks (
   due_date DATE NOT NULL,
   project_id INTEGER NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS projects (
@@ -23,7 +24,8 @@ CREATE TABLE IF NOT EXISTS projects (
   tasks_completed INTEGER NOT NULL CHECK (tasks_completed >= 0),
   total_tasks INTEGER NOT NULL CHECK (total_tasks >= 0),
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP NULL
 );
 
 ALTER TABLE tasks
@@ -34,3 +36,13 @@ ADD CONSTRAINT tasks_project_id_fkey
 FOREIGN KEY (project_id)
 REFERENCES projects (id)
 ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS projects_deleted_at_idx
+ON projects (deleted_at);
+
+CREATE INDEX IF NOT EXISTS tasks_deleted_at_idx
+ON tasks (deleted_at);
+
+CREATE INDEX IF NOT EXISTS tasks_active_project_id_idx
+ON tasks (project_id)
+WHERE deleted_at IS NULL;

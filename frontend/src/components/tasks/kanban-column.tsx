@@ -1,20 +1,20 @@
-import type { DragEvent } from "react"
-import { cn } from "@/lib/utils"
-import { TaskCard } from "./task-card"
-import type { TaskStatus, TaskViewModel } from "@/lib/tasks/types"
+import type { DragEvent } from "react";
+import { cn } from "@/lib/utils";
+import { TaskCard } from "./task-card";
+import type { TaskStatus, TaskViewModel } from "@/lib/tasks/types";
 
 interface KanbanColumnProps {
-  id: TaskStatus
-  title: string
-  color: string
-  tasks: TaskViewModel[]
-  onMoveTask: (taskId: number, status: TaskStatus) => Promise<void>
-  onDeleteTask: (taskId: number) => Promise<void>
-  onEditTask: (task: TaskViewModel) => Promise<void>
-  getProjectName: (projectId: number | null) => string | null
+  id: TaskStatus;
+  title: string;
+  color: string;
+  tasks: TaskViewModel[];
+  onMoveTask: (taskId: number, status: TaskStatus) => Promise<void>;
+  onDeleteTask: (taskId: number) => Promise<void>;
+  onOpenEditTask: (task: TaskViewModel) => void;
+  getProjectName: (projectId: number | null) => string | null;
 }
 
-const TASK_ID_TRANSFER_TYPE = "text/task-id"
+const TASK_ID_TRANSFER_TYPE = "text/task-id";
 
 export function KanbanColumn({
   id,
@@ -23,32 +23,37 @@ export function KanbanColumn({
   tasks,
   onMoveTask,
   onDeleteTask,
-  onEditTask,
+  onOpenEditTask,
   getProjectName,
 }: KanbanColumnProps) {
   const handleDragOver = (event: DragEvent<HTMLElement>) => {
-    event.preventDefault()
-  }
+    event.preventDefault();
+  };
 
   const handleDrop = (event: DragEvent<HTMLElement>) => {
-    event.preventDefault()
-    const taskId = Number(event.dataTransfer.getData(TASK_ID_TRANSFER_TYPE))
+    event.preventDefault();
+    const taskId = Number(event.dataTransfer.getData(TASK_ID_TRANSFER_TYPE));
     if (!Number.isNaN(taskId)) {
-      void onMoveTask(taskId, id)
+      void onMoveTask(taskId, id);
     }
-  }
+  };
 
   return (
     <section
       aria-labelledby={`kanban-${id}`}
-      className="flex min-h-[420px] w-full flex-col rounded-xl border bg-muted/40 sm:min-w-[320px]"
+      className="flex min-h-105 w-full flex-col rounded-xl border bg-muted/40 sm:min-w-[320px]"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       <header className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
           <span className={cn("h-2.5 w-2.5 rounded-full", color)} />
-          <h3 id={`kanban-${id}`} className="text-sm font-semibold text-foreground">{title}</h3>
+          <h3
+            id={`kanban-${id}`}
+            className="text-sm font-semibold text-foreground"
+          >
+            {title}
+          </h3>
         </div>
 
         <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -67,7 +72,7 @@ export function KanbanColumn({
               key={task.id}
               task={task}
               onDeleteTask={onDeleteTask}
-              onEditTask={onEditTask}
+              onOpenEditTask={onOpenEditTask}
               dragDataTransferType={TASK_ID_TRANSFER_TYPE}
               projectName={getProjectName(task.projectId)}
             />
@@ -75,5 +80,5 @@ export function KanbanColumn({
         )}
       </div>
     </section>
-  )
+  );
 }

@@ -5,11 +5,11 @@ interface KanbanBoardProps {
   columns: KanbanColumnData[]
   onMoveTask: (taskId: number, status: TaskStatus) => Promise<void>
   onDeleteTask: (taskId: number) => Promise<void>
-  onEditTask: (task: TaskViewModel) => Promise<void>
+  onOpenEditTask: (task: TaskViewModel) => void
   getProjectName: (projectId: number | null) => string | null
 }
 
-export function KanbanBoard({ columns, onMoveTask, onDeleteTask, onEditTask, getProjectName }: KanbanBoardProps) {
+export function KanbanBoard({ columns, onMoveTask, onDeleteTask, onOpenEditTask, getProjectName }: KanbanBoardProps) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       {columns.map((column) => (
@@ -21,7 +21,7 @@ export function KanbanBoard({ columns, onMoveTask, onDeleteTask, onEditTask, get
           tasks={column.tasks}
           onMoveTask={onMoveTask}
           onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
+          onOpenEditTask={onOpenEditTask}
           getProjectName={getProjectName}
         />
       ))}

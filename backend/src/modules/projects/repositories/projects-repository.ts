@@ -7,6 +7,7 @@ export async function findAllProjects(): Promise<ProjectEntity[]> {
     `
       SELECT id, name, description, status, deadline, progress, tasks_completed, total_tasks
       FROM projects
+      WHERE deleted_at IS NULL
       ORDER BY id ASC
     `
   )
@@ -20,6 +21,7 @@ export async function findProjectById(id: number): Promise<ProjectEntity | null>
       SELECT id, name, description, status, deadline, progress, tasks_completed, total_tasks
       FROM projects
       WHERE id = $1
+        AND deleted_at IS NULL
     `,
     [id]
   )
@@ -58,8 +60,10 @@ export async function updateProject(id: number, input: Omit<ProjectEntity, "id">
           deadline = $4,
           progress = $5,
           tasks_completed = $6,
-          total_tasks = $7
+          total_tasks = $7,
+          updated_at = NOW()
       WHERE id = $8
+        AND deleted_at IS NULL
       RETURNING id, name, description, status, deadline, progress, tasks_completed, total_tasks
     `,
     [
@@ -78,6 +82,45 @@ export async function updateProject(id: number, input: Omit<ProjectEntity, "id">
 }
 
 export async function deleteProject(id: number): Promise<boolean> {
-  const result = await pool.query("DELETE FROM projects WHERE id = $1", [id])
-  return result.rowCount === 1
+  const client = await pool.connect()
+
+  try {
+    await client.query("BEGIN")
+
+    const softDeleteResult = await client.query(
+      `
+        UPDATE projects
+        SET deleted_at = NOW(),
+            updated_at = NOW()
+        WHERE id = $1
+          AND deleted_at IS NULL
+        RETURNING id
+      `,
+      [id]
+    )
+
+    if (softDeleteResult.rowCount !== 1) {
+      await client.query("ROLLBACK")
+      return false
+    }
+
+    await client.query(
+      `
+        UPDATE tasks
+        SET project_id = NULL,
+            updated_at = NOW()
+        WHERE project_id = $1
+          AND deleted_at IS NULL
+      `,
+      [id]
+    )
+
+    await client.query("COMMIT")
+    return true
+  } catch (error) {
+    await client.query("ROLLBACK")
+    throw error
+  } finally {
+    client.release()
+  }
 }

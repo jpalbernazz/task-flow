@@ -14,29 +14,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { projectStatusConfig } from "@/lib/projects/project-status"
+import type { ProjectModalIntent } from "@/components/projects/project-details-modal"
 
 interface ProjectCardProps {
   project: ProjectCardItem
-  onEditProject?: (project: ProjectCardItem) => Promise<void> | void
-}
-
-const statusConfig = {
-  planejado: {
-    label: "Planejado",
-    className: "bg-secondary text-secondary-foreground",
-  },
-  "em-andamento": {
-    label: "Em Andamento",
-    className: "bg-primary/10 text-primary",
-  },
-  concluido: {
-    label: "Concluido",
-    className: "bg-success/10 text-success",
-  },
-  atrasado: {
-    label: "Atrasado",
-    className: "bg-destructive/10 text-destructive",
-  },
+  onOpenProject?: (
+    project: ProjectCardItem,
+    intent: ProjectModalIntent
+  ) => Promise<void> | void
 }
 
 function formatDate(date: string): string {
@@ -56,8 +42,8 @@ function formatDate(date: string): string {
   }).format(parsedDate)
 }
 
-export function ProjectCard({ project, onEditProject }: ProjectCardProps) {
-  const status = statusConfig[project.status]
+export function ProjectCard({ project, onOpenProject }: ProjectCardProps) {
+  const status = projectStatusConfig[project.status]
   const maxVisibleMembers = 3
   const extraMembers = project.members.length - maxVisibleMembers
 
@@ -81,11 +67,12 @@ export function ProjectCard({ project, onEditProject }: ProjectCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => void onOpenProject?.(project, "view")}>
+                Ver detalhes
+              </DropdownMenuItem>
               <DropdownMenuItem
-                onSelect={(event) => {
-                  event.preventDefault()
-                  void onEditProject?.(project)
+                onSelect={() => {
+                  void onOpenProject?.(project, "edit")
                 }}
               >
                 Editar projeto
@@ -139,7 +126,12 @@ export function ProjectCard({ project, onEditProject }: ProjectCardProps) {
             )}
           </div>
 
-          <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-primary hover:text-primary"
+            onClick={() => void onOpenProject?.(project, "view")}
+          >
             Ver projeto
           </Button>
         </div>

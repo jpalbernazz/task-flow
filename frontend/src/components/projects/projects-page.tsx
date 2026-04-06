@@ -3,10 +3,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { ProjectCard } from "@/components/projects/project-card"
+import {
+  ProjectDetailsModal,
+  type ProjectModalIntent,
+  type ProjectModalMode,
+} from "@/components/projects/project-details-modal"
 import { Button } from "@/components/ui/button"
 import { Plus, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import type { ProjectCardItem, ProjectStatus } from "@/lib/projects/types"
+import type { ProjectCardItem } from "@/lib/projects/types"
+import { projectStatusConfig } from "@/lib/projects/project-status"
 import {
   createProject,
   getProjectCards,
@@ -23,24 +29,12 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
   return fallbackMessage
 }
 
-function buildDefaultProjectInput(): CreateProjectInput {
-  const nextMonth = new Date()
-  nextMonth.setDate(nextMonth.getDate() + 30)
-
-  return {
-    name: "Novo Projeto",
-    description: "Descricao do novo projeto",
-    deadline: nextMonth.toISOString().slice(0, 10),
-    status: "planejado",
-    progress: 0,
-    tasksCompleted: 0,
-    totalTasks: 0,
-  }
-}
-
-function normalizeStatus(value: string, fallback: ProjectStatus): ProjectStatus {
-  const validStatus: ProjectStatus[] = ["planejado", "em-andamento", "concluido", "atrasado"]
-  return validStatus.includes(value as ProjectStatus) ? (value as ProjectStatus) : fallback
+function normalizeSearchValue(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
 }
 
 export function ProjectsPageView() {
@@ -49,6 +43,10 @@ export function ProjectsPageView() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState<ProjectModalMode>("create")
+  const [modalIntent, setModalIntent] = useState<ProjectModalIntent>("view")
+  const [selectedProject, setSelectedProject] = useState<ProjectCardItem | null>(null)
 
   const refreshProjects = useCallback(async () => {
     setIsRefreshing(true)
@@ -69,100 +67,82 @@ export function ProjectsPageView() {
   }, [refreshProjects])
 
   const filteredProjects = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase()
+    const normalizedSearch = normalizeSearchValue(searchTerm)
     if (normalizedSearch === "") {
       return projects
     }
 
     return projects.filter((project) => {
+      const statusLabel = projectStatusConfig[project.status].label
+      const searchableValues = [
+        project.name,
+        project.description,
+        project.status,
+        statusLabel,
+      ].map(normalizeSearchValue)
+
       return (
-        project.name.toLowerCase().includes(normalizedSearch) ||
-        project.description.toLowerCase().includes(normalizedSearch)
+        searchableValues.some((value) => value.includes(normalizedSearch))
       )
     })
   }, [projects, searchTerm])
 
-  const handleCreateProject = useCallback(async () => {
-    const baseInput = buildDefaultProjectInput()
-
-    const name = window.prompt("Nome do projeto", baseInput.name)
-    if (name === null) {
-      return
-    }
-
-    const description = window.prompt("Descricao do projeto", baseInput.description)
-    if (description === null) {
-      return
-    }
-
-    const deadline = window.prompt("Prazo (YYYY-MM-DD)", baseInput.deadline)
-    if (deadline === null) {
-      return
-    }
-
-    const input: CreateProjectInput = {
-      ...baseInput,
-      name: name.trim() || baseInput.name,
-      description: description.trim() || baseInput.description,
-      deadline: deadline.trim() || baseInput.deadline,
-    }
-
+  const handleCreateProject = useCallback(async (input: CreateProjectInput) => {
     try {
       await createProject(input)
       setInfoMessage("Projeto criado com sucesso.")
+      setErrorMessage(null)
       await refreshProjects()
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Nao foi possivel criar o projeto."))
+      throw error
     }
   }, [refreshProjects])
 
-  const handleEditProject = useCallback(
-    async (project: ProjectCardItem) => {
-      const name = window.prompt("Editar nome do projeto", project.name)
-      if (name === null) {
-        return
-      }
-
-      const description = window.prompt("Editar descricao do projeto", project.description)
-      if (description === null) {
-        return
-      }
-
-      const deadline = window.prompt("Editar prazo (YYYY-MM-DD)", project.deadline)
-      if (deadline === null) {
-        return
-      }
-
-      const statusValue = window.prompt(
-        "Editar status (planejado, em-andamento, concluido, atrasado)",
-        project.status
-      )
-      if (statusValue === null) {
-        return
-      }
-
-      const payload: UpdateProjectInput = {
-        name: name.trim() || project.name,
-        description: description.trim() || project.description,
-        deadline: deadline.trim() || project.deadline,
-        status: normalizeStatus(statusValue.trim(), project.status),
-      }
-
+  const handleUpdateProject = useCallback(
+    async (projectId: number, input: UpdateProjectInput) => {
       try {
-        const updatedProject = await updateProject(project.id, payload)
+        const updatedProject = await updateProject(projectId, input)
         if (!updatedProject) {
-          setErrorMessage("O projeto nao foi encontrado para edicao.")
-          return
+          const notFoundError = new Error("O projeto nao foi encontrado para edicao.")
+          setErrorMessage(notFoundError.message)
+          throw notFoundError
         }
 
         setInfoMessage("Projeto atualizado com sucesso.")
+        setErrorMessage(null)
         await refreshProjects()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel editar o projeto."))
+        throw error
       }
     },
     [refreshProjects]
   )
+
+  const handleModalOpenChange = (open: boolean) => {
+    setIsModalOpen(open)
+
+    if (!open) {
+      setSelectedProject(null)
+      setModalMode("create")
+      setModalIntent("view")
+    }
+  }
+
+  const handleOpenCreateModal = () => {
+    setSelectedProject(null)
+    setModalMode("create")
+    setModalIntent("edit")
+    setIsModalOpen(true)
+  }
+
+  const handleOpenProjectModal = (project: ProjectCardItem, intent: ProjectModalIntent) => {
+    setSelectedProject(project)
+    setModalMode("view")
+    setModalIntent(intent)
+    setIsModalOpen(true)
+  }
 
   return (
     <DashboardLayout>
@@ -191,7 +171,7 @@ export function ProjectsPageView() {
             <h1 className="text-2xl font-bold text-foreground">Projetos</h1>
             <p className="text-muted-foreground">Gerencie e acompanhe todos os seus projetos</p>
           </div>
-          <Button className="gap-2" onClick={() => void handleCreateProject()}>
+          <Button className="gap-2" onClick={handleOpenCreateModal}>
             <Plus className="h-4 w-4" />
             Novo Projeto
           </Button>
@@ -209,12 +189,34 @@ export function ProjectsPageView() {
           </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} onEditProject={handleEditProject} />
-          ))}
-        </div>
+        {filteredProjects.length === 0 ? (
+          <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+            {searchTerm.trim() === ""
+              ? "Nenhum projeto cadastrado no momento."
+              : "Nenhum projeto encontrado para este filtro."}
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onOpenProject={handleOpenProjectModal}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      <ProjectDetailsModal
+        open={isModalOpen}
+        onOpenChange={handleModalOpenChange}
+        mode={modalMode}
+        initialIntent={modalIntent}
+        project={selectedProject}
+        onCreate={handleCreateProject}
+        onUpdate={handleUpdateProject}
+      />
     </DashboardLayout>
   )
 }
