@@ -1,6 +1,5 @@
 import fs from "node:fs"
 import path from "node:path"
-import { randomUUID } from "node:crypto"
 import type { NextFunction, Request, Response } from "express"
 import { Router } from "express"
 import multer from "multer"
@@ -11,33 +10,13 @@ import { updateMyPassword, updateMyProfile, uploadMyAvatar } from "../controller
 
 const usersRoutes = Router()
 
-const allowedAvatarMimeTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"])
-
 const avatarsAbsoluteDir = path.resolve(process.cwd(), AVATAR_UPLOADS_DIR)
 fs.mkdirSync(avatarsAbsoluteDir, { recursive: true })
 
-const avatarStorage = multer.diskStorage({
-  destination: (_req, _file, callback) => {
-    callback(null, avatarsAbsoluteDir)
-  },
-  filename: (_req, file, callback) => {
-    const extension = path.extname(file.originalname) || ".bin"
-    callback(null, `${Date.now()}-${randomUUID()}${extension.toLowerCase()}`)
-  },
-})
-
 const avatarUpload = multer({
-  storage: avatarStorage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: AVATAR_MAX_SIZE_BYTES,
-  },
-  fileFilter: (_req, file, callback) => {
-    if (!allowedAvatarMimeTypes.has(file.mimetype)) {
-      callback(new AppError(400, "avatar must be jpeg, png, webp or gif"))
-      return
-    }
-
-    callback(null, true)
   },
 })
 

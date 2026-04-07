@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs"
 import { AppError } from "../../../shared/http/app-error"
+import { revokeOtherActiveSessionsByUserId } from "../../auth/repositories/sessions-repository"
 import { entityToUserDTO } from "../mappers/users-mapper"
 import {
   findUserById,
@@ -47,7 +48,15 @@ export async function replaceUserAvatarById(
   }
 }
 
-export async function updateUserPasswordById(userId: number, input: UpdatePasswordDTO): Promise<void> {
+export async function updateUserPasswordById(
+  userId: number,
+  input: UpdatePasswordDTO,
+  currentSessionId: number,
+): Promise<void> {
+  if (!Number.isInteger(currentSessionId) || currentSessionId <= 0) {
+    throw new AppError(401, "authentication required")
+  }
+
   const user = await findUserById(userId)
 
   if (!user || !user.is_active) {
@@ -62,4 +71,5 @@ export async function updateUserPasswordById(userId: number, input: UpdatePasswo
 
   const newPasswordHash = await bcrypt.hash(input.newPassword, 10)
   await updateUserPasswordHash(userId, newPasswordHash)
+  await revokeOtherActiveSessionsByUserId(userId, currentSessionId)
 }

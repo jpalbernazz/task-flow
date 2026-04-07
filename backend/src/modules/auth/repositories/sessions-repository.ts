@@ -73,3 +73,20 @@ export async function revokeActiveSessionsByUserId(userId: number): Promise<void
     [userId],
   )
 }
+
+export async function revokeOtherActiveSessionsByUserId(
+  userId: number,
+  currentSessionId: number,
+): Promise<void> {
+  await pool.query(
+    `
+      UPDATE sessions
+      SET revoked_at = NOW()
+      WHERE user_id = $1
+        AND id <> $2
+        AND revoked_at IS NULL
+        AND expires_at > NOW()
+    `,
+    [userId, currentSessionId],
+  )
+}
