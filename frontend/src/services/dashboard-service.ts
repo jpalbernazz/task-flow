@@ -1,6 +1,5 @@
 import type { DashboardStat, RecentTaskItem } from "@/lib/dashboard/types"
 import { buildDashboardStats, buildRecentTasks, getTodayDateKey } from "@/lib/dashboard/dashboard-utils"
-import { getProjectCards } from "@/services/project-service"
 import { getTasks } from "@/services/task-service"
 
 interface DashboardData {
@@ -9,12 +8,12 @@ interface DashboardData {
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const [tasks, projects] = await Promise.all([getTasks(), getProjectCards()])
+  const tasks = await getTasks()
   const todayDateKey = getTodayDateKey()
 
   return {
-    stats: buildDashboardStats(tasks, projects, todayDateKey),
-    recentTasks: buildRecentTasks(tasks, projects, todayDateKey),
+    stats: buildDashboardStats(tasks, todayDateKey),
+    recentTasks: buildRecentTasks(tasks, todayDateKey),
   }
 }
 

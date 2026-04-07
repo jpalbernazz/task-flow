@@ -91,13 +91,27 @@ export function getTodayDateKey(today = new Date()): string {
   return getDateKey(today.getFullYear(), today.getMonth(), today.getDate())
 }
 
+function normalizeDateKey(value: string): string | null {
+  const normalized = value.slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    return null
+  }
+
+  return normalized
+}
+
 export function buildTasksByDateMap(tasks: CalendarTask[]): Record<string, CalendarTask[]> {
   return tasks.reduce<Record<string, CalendarTask[]>>((accumulator, task) => {
-    if (!accumulator[task.dueDate]) {
-      accumulator[task.dueDate] = []
+    const dueDateKey = normalizeDateKey(task.dueDate)
+    if (!dueDateKey) {
+      return accumulator
     }
 
-    accumulator[task.dueDate].push(task)
+    if (!accumulator[dueDateKey]) {
+      accumulator[dueDateKey] = []
+    }
+
+    accumulator[dueDateKey].push(task)
     return accumulator
   }, {})
 }
@@ -116,10 +130,19 @@ export function getMonthSummary(
 ): CalendarMonthSummary {
   const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}-`
 
-  const tasksInMonth = tasks.filter((task) => task.dueDate.startsWith(monthPrefix))
+  const tasksInMonth = tasks.filter((task) => {
+    const dueDateKey = normalizeDateKey(task.dueDate)
+    return dueDateKey?.startsWith(monthPrefix) ?? false
+  })
   const daysWithTasks = Object.keys(tasksByDate).filter((dateKey) => dateKey.startsWith(monthPrefix)).length
-  const overdueTasks = tasksInMonth.filter((task) => task.dueDate < todayDateKey && task.status !== "done").length
-  const upcomingTasks = tasksInMonth.filter((task) => task.dueDate >= todayDateKey).length
+  const overdueTasks = tasksInMonth.filter((task) => {
+    const dueDateKey = normalizeDateKey(task.dueDate)
+    return dueDateKey !== null && dueDateKey < todayDateKey && task.status !== "done"
+  }).length
+  const upcomingTasks = tasksInMonth.filter((task) => {
+    const dueDateKey = normalizeDateKey(task.dueDate)
+    return dueDateKey !== null && dueDateKey >= todayDateKey && task.status !== "done"
+  }).length
 
   return {
     tasksInMonth: tasksInMonth.length,
@@ -130,15 +153,57 @@ export function getMonthSummary(
 }
 
 export function formatDateLabel(dateKey: string): string {
-  const [year, month, day] = dateKey.split("-")
+  const normalizedDateKey = normalizeDateKey(dateKey)
+  if (!normalizedDateKey) {
+    return dateKey
+  }
+
+  const [year, month, day] = normalizedDateKey.split("-")
   return `${day}/${month}/${year}`
+}
+
+export function getRelativeDateLabel(dateKey: string, todayDateKey = getTodayDateKey()): string | null {
+  const normalizedDateKey = normalizeDateKey(dateKey)
+  if (!normalizedDateKey) {
+    return null
+  }
+
+  if (normalizedDateKey === todayDateKey) {
+    return "Hoje"
+  }
+
+  const dueDateObject = new Date(`${normalizedDateKey}T00:00:00`)
+  const todayDateObject = new Date(`${todayDateKey}T00:00:00`)
+  const diffInMs = dueDateObject.getTime() - todayDateObject.getTime()
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24))
+
+  if (diffInDays === 1) {
+    return "Amanhã"
+  }
+
+  if (diffInDays === -1) {
+    return "Ontem"
+  }
+
+  if (diffInDays > 1) {
+    return `Em ${diffInDays} dias`
+  }
+
+  return `${Math.abs(diffInDays)} dias atrás`
 }
 
 export function getUpcomingDeadlines(tasks: CalendarTask[], limit = 3) {
   const todayKey = getTodayDateKey()
 
   return tasks
-    .filter((task) => task.dueDate >= todayKey)
-    .sort((taskA, taskB) => taskA.dueDate.localeCompare(taskB.dueDate))
+    .filter((task) => {
+      const dueDateKey = normalizeDateKey(task.dueDate)
+      return dueDateKey !== null && dueDateKey >= todayKey && task.status !== "done"
+    })
+    .sort((taskA, taskB) => {
+      const taskADateKey = normalizeDateKey(taskA.dueDate) ?? "9999-12-31"
+      const taskBDateKey = normalizeDateKey(taskB.dueDate) ?? "9999-12-31"
+      return taskADateKey.localeCompare(taskBDateKey)
+    })
     .slice(0, limit)
 }

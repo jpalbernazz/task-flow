@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   formatDateLabel,
   priorityColors,
@@ -15,12 +17,17 @@ export function CalendarSelectedDayPanel() {
     useCalendarPageContext();
 
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <h3 className="mb-3 font-semibold">
+    <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm">
+      <h3 className="mb-1 text-base font-semibold tracking-tight text-foreground">
         {selectedDateLabel
           ? `Tarefas em ${selectedDateLabel}`
           : "Selecione um dia"}
       </h3>
+      <p className="mb-4 text-xs text-muted-foreground">
+        {selectedDayTasks.length > 0
+          ? `${selectedDayTasks.length} tarefa${selectedDayTasks.length > 1 ? "s" : ""} planejada${selectedDayTasks.length > 1 ? "s" : ""}`
+          : "Visualize o detalhamento do dia selecionado"}
+      </p>
 
       {selectedDay === null ? (
         <p className="text-sm text-muted-foreground">
@@ -33,9 +40,25 @@ export function CalendarSelectedDayPanel() {
       ) : (
         <div className="flex flex-col gap-3">
           {selectedDayTasks.map((task) => (
-            <div key={task.id} className="rounded-lg border p-3">
+            <article
+              key={task.id}
+              className="rounded-xl border border-border/80 bg-background/30 p-3"
+            >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <span className="font-medium">{task.title}</span>
+                <span className="font-medium text-foreground">
+                  {task.title}
+                </span>
+
+                <Button variant="outline" size="xs" asChild>
+                  <Link href={`/tasks?edit=${task.id}`}>Editar</Link>
+                </Button>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {task.description.trim() === ""
+                  ? "Sem descrição."
+                  : task.description}
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Badge className={priorityColors[task.priority]}>
                     {priorityLabels[task.priority]}
@@ -44,16 +67,11 @@ export function CalendarSelectedDayPanel() {
                     {statusLabels[task.status]}
                   </Badge>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Prazo: {formatDateLabel(task.dueDate)}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {task.description.trim() === ""
-                  ? "Sem descrição."
-                  : task.description}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Prazo: {formatDateLabel(task.dueDate)}
-              </p>
-            </div>
+            </article>
           ))}
         </div>
       )}

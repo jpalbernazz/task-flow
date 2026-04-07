@@ -1,4 +1,3 @@
-import type { ProjectCardItem } from "@/lib/projects/types";
 import type { TaskViewModel } from "@/lib/tasks/types";
 import type { DashboardStat, RecentTaskItem, RecentTaskStatus } from "./types";
 
@@ -92,18 +91,6 @@ function formatDueDateLabel(dueDate: string, todayDateKey: string): string {
   return `${day}/${month}/${year}`;
 }
 
-function buildProjectsById(
-  projects: ProjectCardItem[],
-): Record<number, ProjectCardItem> {
-  return projects.reduce<Record<number, ProjectCardItem>>(
-    (accumulator, project) => {
-      accumulator[project.id] = project;
-      return accumulator;
-    },
-    {},
-  );
-}
-
 function compareTasksByRelevance(
   taskA: TaskViewModel,
   taskB: TaskViewModel,
@@ -146,7 +133,6 @@ export function getTodayDateKey(today = new Date()): string {
 
 export function buildDashboardStats(
   tasks: TaskViewModel[],
-  projects: ProjectCardItem[],
   todayDateKey: string,
 ): DashboardStat[] {
   const tasksInProgress = tasks.filter(
@@ -191,11 +177,8 @@ export function buildDashboardStats(
 
 export function buildRecentTasks(
   tasks: TaskViewModel[],
-  projects: ProjectCardItem[],
   todayDateKey: string,
 ): RecentTaskItem[] {
-  const projectsById = buildProjectsById(projects);
-
   return tasks
     .slice()
     .sort((taskA, taskB) => compareTasksByRelevance(taskA, taskB, todayDateKey))
@@ -206,7 +189,7 @@ export function buildRecentTasks(
       const projectName =
         task.projectId === null
           ? "Sem projeto"
-          : (projectsById[task.projectId]?.name ?? "Projeto removido");
+          : `Projeto #${task.projectId}`;
 
       return {
         id: String(task.id),
@@ -215,7 +198,6 @@ export function buildRecentTasks(
         status,
         priority: task.priority,
         dueDate: formatDueDateLabel(task.dueDate, todayDateKey),
-        assignee: { name: "Sistema", initials: "SI" },
       };
     });
 }

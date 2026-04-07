@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useState, type KeyboardEvent } from "react"
 import { getErrorMessage } from "@/lib/get-error-message"
 import {
+  MONTHS,
   buildCalendarDays,
   buildTasksByDateMap,
   formatDateLabel,
@@ -17,6 +18,10 @@ import { getCalendarTasks } from "@/services/calendar-service"
 interface UseCalendarPageControllerParams {
   initialTasks: CalendarTask[]
   initialError?: string | null
+}
+
+function clampDay(day: number, daysInMonth: number): number {
+  return Math.min(daysInMonth, Math.max(1, day))
 }
 
 export function useCalendarPageController({
@@ -47,6 +52,7 @@ export function useCalendarPageController({
   const { year, month, startingDayOfWeek, daysInMonth } = useMemo(() => {
     return getMonthContext(currentDate)
   }, [currentDate])
+  const monthLabel = useMemo(() => `${MONTHS[month]} ${year}`, [month, year])
 
   const refreshCalendarTasks = useCallback(async () => {
     setIsRefreshing(true)
@@ -76,6 +82,55 @@ export function useCalendarPageController({
     setCurrentDate(new Date(todayContext.year, todayContext.month, 1))
     setSelectedDay(todayContext.day)
   }, [todayContext])
+
+  const selectDay = useCallback(
+    (day: number) => {
+      if (day < 1 || day > daysInMonth) {
+        return
+      }
+
+      setSelectedDay(day)
+    },
+    [daysInMonth],
+  )
+
+  const handleDayKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>, day: number): number | null => {
+      if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+        event.preventDefault()
+        setSelectedDay(day)
+        return day
+      }
+
+      let nextDay = day
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault()
+        nextDay = clampDay(day - 1, daysInMonth)
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault()
+        nextDay = clampDay(day + 1, daysInMonth)
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault()
+        nextDay = clampDay(day - 7, daysInMonth)
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault()
+        nextDay = clampDay(day + 7, daysInMonth)
+      } else if (event.key === "Home") {
+        event.preventDefault()
+        nextDay = 1
+      } else if (event.key === "End") {
+        event.preventDefault()
+        nextDay = daysInMonth
+      } else {
+        return null
+      }
+
+      setSelectedDay(nextDay)
+      return nextDay
+    },
+    [daysInMonth],
+  )
 
   const tasksByDate = useMemo(() => buildTasksByDateMap(calendarTasks), [calendarTasks])
 
@@ -122,13 +177,29 @@ export function useCalendarPageController({
     [errorMessage, infoMessage, isRefreshing],
   )
 
+  const calendarUiState = useMemo(() => {
+    const hasTasks = calendarTasks.length > 0
+    const hasTasksInMonth = monthSummary.tasksInMonth > 0
+    const hasError = errorMessage !== null
+
+    return {
+      hasTasks,
+      hasTasksInMonth,
+      isGlobalEmpty: !isRefreshing && !hasError && !hasTasks,
+      isMonthEmpty: !isRefreshing && !hasError && hasTasks && !hasTasksInMonth,
+    }
+  }, [calendarTasks.length, monthSummary.tasksInMonth, errorMessage, isRefreshing])
+
   return {
     year,
     month,
+    monthLabel,
     todayContext,
     calendarTasks,
     selectedDay,
     setSelectedDay,
+    selectDay,
+    handleDayKeyDown,
     errorMessage,
     infoMessage,
     isRefreshing,
@@ -143,5 +214,6 @@ export function useCalendarPageController({
     selectedDayTasks,
     selectedDateLabel,
     viewState,
+    calendarUiState,
   }
 }

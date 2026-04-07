@@ -8,11 +8,6 @@ export interface RecentTaskItem {
   status: RecentTaskStatus
   priority: RecentTaskPriority
   dueDate: string
-  assignee: {
-    name: string
-    avatar?: string
-    initials: string
-  }
 }
 
 export interface DashboardStat {

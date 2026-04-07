@@ -23,14 +23,22 @@ export default async function CalendarPage() {
   return (
     <CalendarPageProvider initialTasks={initialTasks} initialError={initialError}>
       <DashboardLayout>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 lg:gap-8">
           <CalendarPageFeedback />
           <CalendarPageHeader />
           <CalendarSummary />
-          <CalendarGrid />
-          <CalendarSelectedDayPanel />
-          <CalendarUpcomingDeadlines />
-          <CalendarEmptyState />
+
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_24rem]">
+            <div className="flex min-w-0 flex-col gap-4">
+              <CalendarGrid />
+              <CalendarEmptyState />
+            </div>
+
+            <aside className="flex flex-col gap-4 xl:sticky xl:top-24 xl:self-start">
+              <CalendarSelectedDayPanel />
+              <CalendarUpcomingDeadlines />
+            </aside>
+          </div>
         </div>
       </DashboardLayout>
     </CalendarPageProvider>
