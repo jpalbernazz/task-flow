@@ -1,44 +1,95 @@
-# Backend API
+# Backend API - Task Flow
 
-## Rodando a API
+API REST em Node.js + Express para autenticação, usuários, tarefas e projetos.
 
-1. `cp .env.template .env`
-2. `npm install`
-3. `npm run dev`
+## Stack
 
-## Estrutura por domínio
+- Node.js + Express
+- TypeScript
+- PostgreSQL
+- `pg` para acesso ao banco
+- `multer` para upload de avatar
 
-- `src/modules/tasks/controllers` -> camada HTTP (request/response)
-- `src/modules/tasks/validators` -> validação de payload e params
-- `src/modules/tasks/services` -> regras de negócio da feature
-- `src/modules/tasks/repositories` -> acesso ao banco (SQL)
-- `src/modules/tasks/mappers` -> mapeamento entre entity (snake_case) e dto (camelCase)
-- `src/modules/tasks/types` -> contratos internos da feature
-- `src/shared/http` -> erro de aplicação e middleware global
-- `src/database` -> conexão e scripts SQL versionados
+## Pré-requisitos
 
-## Banco de dados (PostgreSQL)
+- Node.js 20+
+- npm 10+
+- PostgreSQL 14+
 
-Estrutura de scripts:
+## Variáveis de Ambiente
 
-- `src/database/migrations` -> criação/evolução de estrutura
-- `src/database/seeds` -> dados iniciais
-- `src/database/scripts` -> utilitários (ex: reset)
+Crie o arquivo local:
 
-Comandos:
+```bash
+cp .env.template .env
+```
 
-- `npm run db:migrate` -> aplica migrations
-- `npm run db:seed` -> aplica seeds
-- `npm run db:setup` -> migrate + seed
-- `npm run db:reset` -> drop de tabelas
-- `npm run db:rebuild` -> reset + migrate + seed
+Template:
 
-Uso no DBeaver:
+```env
+PORT=3001
+FRONTEND_ORIGIN=http://localhost:3000
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=task_flow
+PGUSER=postgres
+PGPASSWORD=postgres
+SESSION_COOKIE_NAME=taskflow_session
+SESSION_TTL_DAYS=7
+RESET_PASSWORD_TTL_MINUTES=60
+AVATAR_MAX_SIZE_MB=2
+AVATAR_UPLOADS_DIR=uploads/avatars
+```
 
-- Para aplicação manual, use `src/database/schema.sql`.
-- Para manter padrão do projeto, prefira executar os comandos npm acima.
+`FRONTEND_ORIGIN` aceita múltiplas origens separadas por vírgula.
+
+## Instalação e Execução
+
+```bash
+npm install
+npm run db:setup
+npm run dev
+```
+
+Servidor padrão em `http://localhost:3001`.
+
+Health check:
+
+- `GET /health`
+
+## Scripts
+
+- `npm run dev`: inicia API em modo desenvolvimento (`tsx watch`)
+- `npm run start`: inicia API sem watch
+- `npm run db:migrate`: executa migrations
+- `npm run db:seed`: executa seeds
+- `npm run db:reset`: executa scripts de reset
+- `npm run db:setup`: migrations + seeds
+- `npm run db:rebuild`: reset + migrations + seeds
+
+## Estrutura de Pastas
+
+- `src/modules`: módulos de domínio
+- `src/modules/*/controllers`: camada HTTP
+- `src/modules/*/validators`: validação de payload/params
+- `src/modules/*/services`: regras de negócio
+- `src/modules/*/repositories`: acesso a banco
+- `src/modules/*/mappers`: transformação entity/dto
+- `src/shared`: middleware, erros e utilitários compartilhados
+- `src/database`: conexão, migrations, seeds e scripts
+
+## Banco de Dados
+
+- `src/database/migrations`: evolução de estrutura
+- `src/database/seeds`: dados iniciais
+- `src/database/scripts`: utilitários SQL (ex.: reset)
+- `src/database/schema.sql`: snapshot para referência/aplicação manual
+
+Para manter o padrão do projeto, prefira os scripts npm (`db:*`).
 
 ## Endpoints
+
+### Auth
 
 - `POST /auth/register`
 - `POST /auth/login`
@@ -46,49 +97,54 @@ Uso no DBeaver:
 - `GET /auth/me`
 - `POST /auth/forgot-password`
 - `POST /auth/reset-password`
+
+### Tasks (requer autenticação)
+
 - `GET /tasks`
 - `POST /tasks`
+- `PUT /tasks/reorder`
 - `PUT /tasks/:id`
 - `DELETE /tasks/:id`
+
+### Projects (requer autenticação)
+
 - `GET /projects`
 - `POST /projects`
 - `PUT /projects/:id`
 - `DELETE /projects/:id`
+
+### Users (requer autenticação)
+
 - `PATCH /users/me`
+- `PATCH /users/me/password`
 - `POST /users/me/avatar`
 
-## Modelo de Workspace
+## Sessão, Autenticação e Upload
 
-- Este MVP usa **workspace compartilhado** por instância.
-- Todos os usuários autenticados veem e gerenciam o mesmo conjunto de `tasks` e `projects`.
-- Não existe autorização por proprietário (`owner`) nesta fase.
+- Sessão via cookie HTTP-only.
+- Rotas de `tasks`, `projects` e `users` retornam `401` sem sessão válida.
+- Upload de avatar com `multipart/form-data` e campo `avatar`.
+- Avatares são salvos em `uploads/avatars` e servidos em `/uploads/avatars/*`.
 
-## Usuário padrão para desenvolvimento
-
-Após `npm run db:setup`, o seed cria:
-
-- email: `admin@taskflow.local`
-- senha: `admin123`
-
-## Sessão e upload
-
-- A autenticação usa cookie HTTP-only de sessão.
-- Cadastro cria conta pronta para login.
-- Rotas de `tasks`, `projects` e `users` exigem autenticação (`401` sem sessão válida).
-- O upload de avatar usa `multipart/form-data` com campo `avatar`.
-- Arquivos de avatar ficam em `backend/uploads/avatars` e são servidos em `/uploads/avatars/*`.
-
-## Recuperação de senha
+## Recuperação de Senha
 
 - `POST /auth/forgot-password` retorna `resetUrl` para uso local no frontend.
-- `RESET_PASSWORD_TTL_MINUTES` define a expiração do token de redefinição.
+- Validade do token configurada por `RESET_PASSWORD_TTL_MINUTES`.
 
-## Contrato de Tasks
+## Modelo de Workspace (MVP)
 
-API HTTP de tasks usa `camelCase`.
-`snake_case` é mantido apenas na camada de persistência (banco/repositório).
+- Workspace compartilhado por instância.
+- Todos os usuários autenticados visualizam/gerenciam o mesmo conjunto de tarefas e projetos.
+- Não há autorização por dono (`owner`) nesta etapa.
 
-Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
+## Contrato da API
+
+A API expõe dados em `camelCase`.
+`snake_case` fica restrito à camada de persistência.
+
+### Exemplo de payload de task
+
+`POST /tasks` e `PUT /tasks/:id`
 
 ```json
 {
@@ -103,12 +159,9 @@ Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
 
 `projectId` é opcional e aceita `null`.
 
-## Contrato de Projects
+### Exemplo de payload de project
 
-API HTTP de projects usa `camelCase`.
-`snake_case` é mantido apenas na camada de persistência (banco/repositório).
-
-Payload de escrita para `POST /projects` e `PUT /projects/:id`:
+`POST /projects` e `PUT /projects/:id`
 
 ```json
 {
@@ -122,12 +175,9 @@ Payload de escrita para `POST /projects` e `PUT /projects/:id`:
 }
 ```
 
-## Fluxo Local com Frontend
+## Usuário Seed (Desenvolvimento)
 
-1. Backend: `cp .env.template .env`
-2. Backend: `npm install`
-3. Backend: `npm run db:setup`
-4. Backend: `npm run dev`
-5. Frontend: criar `frontend/.env` a partir de `frontend/.env.template`
-6. Frontend: `npm install`
-7. Frontend: `npm run dev`
+Após `npm run db:setup`:
+
+- email: `admin@taskflow.local`
+- senha: `admin123`
