@@ -9,6 +9,7 @@ export interface TaskEntity {
   priority: TaskPriority
   due_date: string
   project_id: number | null
+  position: number
 }
 
 export interface TaskDTO {
@@ -19,6 +20,7 @@ export interface TaskDTO {
   priority: TaskPriority
   dueDate: string
   projectId: number | null
+  position: number
 }
 
 export interface CreateTaskDTO {
@@ -37,4 +39,13 @@ export interface UpdateTaskDTO {
   priority?: TaskPriority
   dueDate?: string
   projectId?: number | null
+}
+
+export interface TaskReorderColumnDTO {
+  status: TaskStatus
+  taskIds: number[]
+}
+
+export interface TaskReorderDTO {
+  columns: TaskReorderColumnDTO[]
 }

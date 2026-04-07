@@ -1,5 +1,6 @@
 import type {
   KanbanColumnData,
+  ReorderTasksInput,
   TaskPriority,
   TaskStatus,
   TaskViewModel,
@@ -11,8 +12,16 @@ const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
   { id: "done", title: "Concluida", color: "bg-success" },
 ]
 
-export type CreateTaskInput = Omit<TaskViewModel, "id">
-export type UpdateTaskInput = Partial<Omit<TaskViewModel, "id">>
+export interface CreateTaskInput {
+  title: string
+  description: string
+  status: TaskStatus
+  priority: TaskPriority
+  dueDate: string
+  projectId: number | null
+}
+
+export type UpdateTaskInput = Partial<CreateTaskInput>
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001"
 const TASKS_ENDPOINT = `${API_BASE_URL}/tasks`
@@ -134,6 +143,18 @@ export async function deleteTask(id: number): Promise<boolean> {
   }
 
   return true
+}
+
+export async function reorderTasks(input: ReorderTasksInput): Promise<void> {
+  const response = await fetch(`${TASKS_ENDPOINT}/reorder`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    await throwApiError(response, "failed to reorder tasks")
+  }
 }
 
 export async function getTaskViewModels(): Promise<TaskViewModel[]> {

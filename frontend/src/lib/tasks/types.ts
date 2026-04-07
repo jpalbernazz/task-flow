@@ -10,6 +10,7 @@ export interface TaskViewModel {
   priority: TaskPriority
   dueDate: string
   projectId: number | null
+  position: number
 }
 
 export interface KanbanColumnData {
@@ -17,4 +18,13 @@ export interface KanbanColumnData {
   title: string
   color: string
   tasks: TaskViewModel[]
+}
+
+export interface TaskReorderColumnInput {
+  status: TaskStatus
+  taskIds: number[]
+}
+
+export interface ReorderTasksInput {
+  columns: TaskReorderColumnInput[]
 }

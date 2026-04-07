@@ -9,6 +9,7 @@ export const mockTaskApi: TaskViewModel[] = [
     priority: "high",
     dueDate: "2026-04-12",
     projectId: null,
+    position: 0,
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ export const mockTaskApi: TaskViewModel[] = [
     priority: "medium",
     dueDate: "2026-04-09",
     projectId: null,
+    position: 0,
   },
   {
     id: 3,
@@ -27,5 +29,6 @@ export const mockTaskApi: TaskViewModel[] = [
     priority: "low",
     dueDate: "2026-04-05",
     projectId: null,
+    position: 0,
   },
 ]

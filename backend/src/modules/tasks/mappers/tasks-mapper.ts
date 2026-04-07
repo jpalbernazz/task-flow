@@ -14,6 +14,7 @@ export function entityToTaskDTO(entity: TaskEntity): TaskDTO {
     priority: entity.priority,
     dueDate: entity.due_date,
     projectId: entity.project_id,
+    position: entity.position,
   }
 }
 
@@ -25,6 +26,7 @@ export function createTaskDTOToEntityInput(input: CreateTaskDTO): Omit<TaskEntit
     priority: input.priority,
     due_date: input.dueDate,
     project_id: input.projectId ?? null,
+    position: 0,
   }
 }
 

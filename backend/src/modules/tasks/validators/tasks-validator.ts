@@ -2,6 +2,7 @@ import { AppError } from "../../../shared/http/app-error"
 import type {
   CreateTaskDTO,
   TaskPriority,
+  TaskReorderDTO,
   TaskStatus,
   UpdateTaskDTO,
 } from "../types/tasks-types"
@@ -45,6 +46,15 @@ interface UpdateTaskHttpInput {
   priority?: TaskPriority
   dueDate?: string
   projectId?: number | null
+}
+
+interface ReorderTaskColumnHttpInput {
+  status: TaskStatus
+  taskIds: number[]
+}
+
+interface ReorderTaskHttpInput {
+  columns: ReorderTaskColumnHttpInput[]
 }
 
 export function parseTaskId(value: unknown): number {
@@ -146,4 +156,56 @@ export function validateUpdateTaskPayload(payload: unknown): UpdateTaskDTO {
     dueDate: data.dueDate,
     projectId: data.projectId,
   }
+}
+
+export function validateReorderTasksPayload(payload: unknown): TaskReorderDTO {
+  const data = payload as Partial<ReorderTaskHttpInput>
+
+  if (!Array.isArray(data.columns) || data.columns.length !== validStatus.length) {
+    throw new AppError(400, "columns must include one entry for each status")
+  }
+
+  const seenStatuses = new Set<TaskStatus>()
+  const seenTaskIds = new Set<number>()
+
+  const columns = data.columns.map((column) => {
+    if (!column || !hasValidStatus(column.status)) {
+      throw new AppError(400, "each column status must be todo, in_progress or done")
+    }
+
+    if (seenStatuses.has(column.status)) {
+      throw new AppError(400, "columns must not contain duplicate status")
+    }
+    seenStatuses.add(column.status)
+
+    if (!Array.isArray(column.taskIds)) {
+      throw new AppError(400, "taskIds must be an array of positive integers")
+    }
+
+    const taskIds = column.taskIds.map((taskId) => {
+      if (!hasValidProjectId(taskId)) {
+        throw new AppError(400, "taskIds must contain only positive integers")
+      }
+
+      if (seenTaskIds.has(taskId)) {
+        throw new AppError(400, "taskIds must not contain duplicates")
+      }
+      seenTaskIds.add(taskId)
+
+      return taskId
+    })
+
+    return {
+      status: column.status,
+      taskIds,
+    }
+  })
+
+  for (const status of validStatus) {
+    if (!seenStatuses.has(status)) {
+      throw new AppError(400, "columns must include todo, in_progress and done")
+    }
+  }
+
+  return { columns }
 }

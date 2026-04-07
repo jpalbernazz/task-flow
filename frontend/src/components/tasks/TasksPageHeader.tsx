@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Filter, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Filter, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Combobox,
   ComboboxCollection,
@@ -11,13 +11,13 @@ import {
   ComboboxItem,
   ComboboxList,
   useComboboxAnchor,
-} from "@/components/ui/combobox"
-import { InputGroupAddon } from "@/components/ui/input-group"
-import type { ProjectFilterOption } from "@/lib/tasks/useTasksPageController"
-import { useTasksPageContext } from "@/lib/tasks/tasks-page-context"
+} from "@/components/ui/combobox";
+import { InputGroupAddon } from "@/components/ui/input-group";
+import type { ProjectFilterOption } from "@/lib/tasks/useTasksPageController";
+import { useTasksPageContext } from "@/lib/tasks/tasks-page-context";
 
 export function TasksPageHeader() {
-  const projectFilterAnchor = useComboboxAnchor()
+  const projectFilterAnchor = useComboboxAnchor();
 
   const {
     selectedProjectOption,
@@ -25,13 +25,15 @@ export function TasksPageHeader() {
     projectFilterOptions,
     setSelectedProjectFilter,
     handleOpenCreateTaskModal,
-  } = useTasksPageContext()
+  } = useTasksPageContext();
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Tarefas</h1>
-        <p className="pl-0.5 text-sm text-muted-foreground ">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          Tarefas
+        </h1>
+        <p className="pl-0.5 text-muted-foreground ">
           Gerencie suas tarefas com o quadro Kanban
         </p>
       </div>
@@ -39,7 +41,9 @@ export function TasksPageHeader() {
       <div className="flex items-center gap-2">
         <Combobox
           value={selectedProjectOption}
-          onValueChange={(value) => setSelectedProjectFilter(value?.value ?? "all")}
+          onValueChange={(value) =>
+            setSelectedProjectFilter(value?.value ?? "all")
+          }
           items={projectFilterOptions}
           isItemEqualToValue={(item, value) => item.value === value.value}
         >
@@ -83,5 +87,5 @@ export function TasksPageHeader() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,23 +1,24 @@
-"use client"
+"use client";
 
-import { Plus, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useProjectsPageContext } from "@/lib/projects/projects-page-context"
+import { Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useProjectsPageContext } from "@/lib/projects/projects-page-context";
 
 export function ProjectsPageHeader() {
-  const {
-    searchTerm,
-    setSearchTerm,
-    handleOpenCreateModal,
-  } = useProjectsPageContext()
+  const { searchTerm, setSearchTerm, handleOpenCreateModal } =
+    useProjectsPageContext();
 
   return (
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Projetos</h1>
-          <p className="text-muted-foreground">Gerencie e acompanhe todos os seus projetos</p>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            Projetos
+          </h1>
+          <p className="pl-0.5 text-muted-foreground">
+            Gerencie e acompanhe todos os seus projetos
+          </p>
         </div>
         <Button className="gap-2" onClick={handleOpenCreateModal}>
           <Plus className="h-4 w-4" />
@@ -37,5 +38,5 @@ export function ProjectsPageHeader() {
         </div>
       </div>
     </>
-  )
+  );
 }

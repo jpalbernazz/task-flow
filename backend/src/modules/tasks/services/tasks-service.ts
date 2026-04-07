@@ -5,8 +5,21 @@ import {
   entityToTaskDTO,
   updateTaskDTOToEntityInput,
 } from "../mappers/tasks-mapper"
-import { deleteTask, findAllTasks, findTaskById, insertTask, updateTask } from "../repositories/tasks-repository"
-import type { CreateTaskDTO, TaskDTO, UpdateTaskDTO } from "../types/tasks-types"
+import {
+  bulkReorderTasks,
+  deleteTask,
+  findAllTasks,
+  findTaskById,
+  getNextPositionForStatus,
+  insertTask,
+  updateTask,
+} from "../repositories/tasks-repository"
+import type {
+  CreateTaskDTO,
+  TaskDTO,
+  TaskReorderDTO,
+  UpdateTaskDTO,
+} from "../types/tasks-types"
 
 async function ensureProjectExists(projectId: number | null | undefined): Promise<void> {
   if (projectId === undefined || projectId === null) {
@@ -26,7 +39,9 @@ export async function getTasks(): Promise<TaskDTO[]> {
 
 export async function createTask(input: CreateTaskDTO): Promise<TaskDTO> {
   await ensureProjectExists(input.projectId)
-  const createdTask = await insertTask(createTaskDTOToEntityInput(input))
+  const entityInput = createTaskDTOToEntityInput(input)
+  entityInput.position = await getNextPositionForStatus(entityInput.status)
+  const createdTask = await insertTask(entityInput)
   return entityToTaskDTO(createdTask)
 }
 
@@ -42,6 +57,10 @@ export async function editTaskById(id: number, input: UpdateTaskDTO): Promise<Ta
     ...updateTaskDTOToEntityInput(input),
   }
 
+  if (input.status !== undefined && input.status !== currentTask.status) {
+    mergedTask.position = await getNextPositionForStatus(input.status)
+  }
+
   const updatedTask = await updateTask(id, mergedTask)
   if (!updatedTask) {
     throw new AppError(404, "task not found")
@@ -55,4 +74,30 @@ export async function removeTaskById(id: number): Promise<void> {
   if (!deleted) {
     throw new AppError(404, "task not found")
   }
+}
+
+export async function reorderTasksBoard(input: TaskReorderDTO): Promise<void> {
+  const currentTasks = await findAllTasks()
+  const currentTaskIds = new Set(currentTasks.map((task) => task.id))
+
+  const orderedTaskIds = input.columns.flatMap((column) => column.taskIds)
+  if (orderedTaskIds.length !== currentTaskIds.size) {
+    throw new AppError(400, "reorder payload must include all active tasks")
+  }
+
+  for (const taskId of orderedTaskIds) {
+    if (!currentTaskIds.has(taskId)) {
+      throw new AppError(400, "reorder payload contains unknown task ids")
+    }
+  }
+
+  const updates = input.columns.flatMap((column) =>
+    column.taskIds.map((taskId, position) => ({
+      id: taskId,
+      status: column.status,
+      position,
+    }))
+  )
+
+  await bulkReorderTasks(updates)
 }

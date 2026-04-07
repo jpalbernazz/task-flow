@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   priority VARCHAR(20) NOT NULL CHECK (priority IN ('low', 'medium', 'high')),
   due_date DATE NOT NULL,
   project_id INTEGER NULL,
+  position INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   deleted_at TIMESTAMP NULL
@@ -45,4 +46,8 @@ ON tasks (deleted_at);
 
 CREATE INDEX IF NOT EXISTS tasks_active_project_id_idx
 ON tasks (project_id)
+WHERE deleted_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS tasks_active_status_position_idx
+ON tasks (status, position, id)
 WHERE deleted_at IS NULL;

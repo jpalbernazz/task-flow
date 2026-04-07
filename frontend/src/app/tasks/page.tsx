@@ -1,6 +1,6 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
-import { KanbanBoard } from "@/components/tasks/KanbanBoard"
 import { TaskDetailsModal } from "@/components/tasks/TaskDetailsModal"
+import { TasksKanbanClient } from "@/components/tasks/TasksKanbanClient"
 import { TasksPageFeedback } from "@/components/tasks/TasksPageFeedback"
 import { TasksPageHeader } from "@/components/tasks/TasksPageHeader"
 import { TasksPageProvider } from "@/lib/tasks/tasks-page-context"
@@ -23,7 +23,7 @@ export default async function TasksPage() {
         <div className="flex flex-col gap-6">
           <TasksPageFeedback />
           <TasksPageHeader />
-          <KanbanBoard />
+          <TasksKanbanClient />
         </div>
 
         <TaskDetailsModal />

@@ -7,6 +7,7 @@ import {
   createTask,
   deleteTask,
   getTasks,
+  reorderTasks,
   type CreateTaskInput,
   type UpdateTaskInput,
   updateTask,
@@ -110,6 +111,8 @@ export function useTasksPageController({
     )
   }, [projectFilterOptions, selectedProjectFilter])
 
+  const canReorderTasks = selectedProjectFilter === "all"
+
   const handleCreateTask = useCallback(
     async (input: CreateTaskInput) => {
       try {
@@ -203,6 +206,46 @@ export function useTasksPageController({
     [refreshData],
   )
 
+  const handleReorderTasksBoard = useCallback(
+    async (nextColumns: KanbanColumnData[]) => {
+      if (!canReorderTasks) {
+        return
+      }
+
+      const previousTasks = tasks
+      const reorderedTaskIds = new Set<number>()
+      const optimisticallyReorderedTasks = nextColumns.flatMap((column) =>
+        column.tasks.map((task, position) => {
+          reorderedTaskIds.add(task.id)
+
+          return {
+            ...task,
+            status: column.id,
+            position,
+          }
+        }),
+      )
+      const untouchedTasks = previousTasks.filter((task) => !reorderedTaskIds.has(task.id))
+
+      setTasks([...optimisticallyReorderedTasks, ...untouchedTasks])
+
+      try {
+        await reorderTasks({
+          columns: nextColumns.map((column) => ({
+            status: column.id,
+            taskIds: column.tasks.map((task) => task.id),
+          })),
+        })
+        setErrorMessage(null)
+      } catch (error) {
+        setTasks(previousTasks)
+        setErrorMessage(getErrorMessage(error, "Nao foi possivel reordenar as tarefas."))
+        throw error
+      }
+    },
+    [canReorderTasks, tasks],
+  )
+
   const handleTaskModalOpenChange = useCallback((open: boolean) => {
     setIsTaskModalOpen(open)
 
@@ -251,6 +294,7 @@ export function useTasksPageController({
     setSelectedProjectFilter,
     projectFilterOptions,
     selectedProjectOption,
+    canReorderTasks,
     errorMessage,
     infoMessage,
     isRefreshing,
@@ -266,6 +310,7 @@ export function useTasksPageController({
     handleDeleteTask,
     handleUpdateTask,
     handleDeleteTaskFromModal,
+    handleReorderTasksBoard,
     getProjectName,
     viewState,
   }
