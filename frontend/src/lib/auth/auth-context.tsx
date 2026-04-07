@@ -14,6 +14,7 @@ import type { AuthUser } from "@/lib/auth/types"
 import {
   getCurrentUser,
   logout as logoutSession,
+  updateMyPassword,
   updateMyProfile,
   uploadMyAvatar,
 } from "@/services/auth-service"
@@ -26,6 +27,7 @@ interface AuthContextValue {
   logout: () => Promise<void>
   uploadAvatar: (file: File) => Promise<void>
   updateProfileName: (name: string) => Promise<void>
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<string>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -79,6 +81,10 @@ export function AuthProvider({ initialUser, children }: AuthProviderProps) {
     setUser(updatedUser)
   }, [])
 
+  const updatePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    return updateMyPassword({ currentPassword, newPassword })
+  }, [])
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -88,8 +94,9 @@ export function AuthProvider({ initialUser, children }: AuthProviderProps) {
       logout,
       uploadAvatar,
       updateProfileName,
+      updatePassword,
     }),
-    [user, isLoading, refreshUser, logout, uploadAvatar, updateProfileName],
+    [user, isLoading, refreshUser, logout, uploadAvatar, updateProfileName, updatePassword],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

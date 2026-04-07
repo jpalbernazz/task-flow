@@ -1,38 +1,52 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { CheckSquare } from "lucide-react"
-import { cn } from "@/lib/utils"
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   mainNavigationItems,
   secondaryNavigationItems,
-} from "@/services/navigation-service"
+} from "@/services/navigation-service";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 
 interface MobileSidebarProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-64 bg-sidebar p-0 text-sidebar-foreground">
-        <SheetHeader className="flex h-16 flex-row items-center gap-3 border-b border-sidebar-border px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <CheckSquare className="h-5 w-5 text-primary-foreground" />
+      <SheetContent
+        side="left"
+        className="w-64 bg-sidebar p-0 text-sidebar-foreground"
+      >
+        <SheetHeader className="flex h-16 flex-row items-center gap-2 border-b border-sidebar-border px-6">
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-sidebar-border/70 bg-sidebar-accent/40 shadow-sm">
+            <Image
+              src="/icon.svg"
+              alt="TaskFlow"
+              width={40}
+              height={40}
+              className="h-full w-full object-cover"
+              priority
+            />
           </div>
-          <SheetTitle className="text-lg font-semibold text-sidebar-foreground">TaskFlow</SheetTitle>
-          <SheetDescription className="sr-only">Menu de navegação principal</SheetDescription>
+          <SheetTitle className="text-lg font-semibold tracking-tight text-sidebar-foreground">
+            TaskFlow
+          </SheetTitle>
+          <SheetDescription className="sr-only">
+            Menu de navegação principal
+          </SheetDescription>
         </SheetHeader>
 
         <nav className="flex flex-1 flex-col gap-1 p-4">
@@ -41,7 +55,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           </div>
 
           {mainNavigationItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
@@ -51,13 +65,13 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
                 )}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
               </Link>
-            )
+            );
           })}
         </nav>
 
@@ -76,5 +90,5 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

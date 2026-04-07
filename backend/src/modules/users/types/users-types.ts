@@ -30,6 +30,11 @@ export interface UpdateProfileDTO {
   name: string
 }
 
+export interface UpdatePasswordDTO {
+  currentPassword: string
+  newPassword: string
+}
+
 export interface ReplaceAvatarDTO {
   avatarUrl: string
   avatarStorageKey: string

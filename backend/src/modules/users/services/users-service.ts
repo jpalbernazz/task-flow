@@ -1,13 +1,16 @@
+import bcrypt from "bcryptjs"
 import { AppError } from "../../../shared/http/app-error"
 import { entityToUserDTO } from "../mappers/users-mapper"
 import {
   findUserById,
   updateUserAvatar,
   updateUserName,
+  updateUserPasswordHash,
 } from "../repositories/users-repository"
 import type {
   ReplaceAvatarDTO,
   ReplaceAvatarResultDTO,
+  UpdatePasswordDTO,
   UpdateProfileDTO,
   UserDTO,
 } from "../types/users-types"
@@ -42,4 +45,21 @@ export async function replaceUserAvatarById(
     user: entityToUserDTO(updatedUser),
     previousAvatarStorageKey: currentUser.avatar_storage_key,
   }
+}
+
+export async function updateUserPasswordById(userId: number, input: UpdatePasswordDTO): Promise<void> {
+  const user = await findUserById(userId)
+
+  if (!user || !user.is_active) {
+    throw new AppError(404, "user not found")
+  }
+
+  const isCurrentPasswordValid = await bcrypt.compare(input.currentPassword, user.password_hash)
+
+  if (!isCurrentPasswordValid) {
+    throw new AppError(403, "current password is invalid")
+  }
+
+  const newPasswordHash = await bcrypt.hash(input.newPassword, 10)
+  await updateUserPasswordHash(userId, newPasswordHash)
 }

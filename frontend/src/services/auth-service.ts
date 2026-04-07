@@ -37,6 +37,11 @@ interface UpdateProfileInput {
   name: string
 }
 
+interface UpdatePasswordInput {
+  currentPassword: string
+  newPassword: string
+}
+
 function withAbsoluteAvatarUrl(user: AuthUser): AuthUser {
   if (!user.avatarUrl) {
     return user
@@ -170,4 +175,19 @@ export async function uploadMyAvatar(file: File): Promise<AuthUser> {
 
   const data = (await response.json()) as AuthResponse
   return withAbsoluteAvatarUrl(data.user)
+}
+
+export async function updateMyPassword(input: UpdatePasswordInput): Promise<string> {
+  const response = await apiFetch("/users/me/password", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    await throwApiError(response, "Não foi possível atualizar sua senha.")
+  }
+
+  const data = (await response.json()) as MessageResponse
+  return data.message
 }

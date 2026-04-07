@@ -7,7 +7,7 @@ import multer from "multer"
 import { AVATAR_MAX_SIZE_BYTES, AVATAR_MAX_SIZE_MB, AVATAR_UPLOADS_DIR } from "../../../shared/auth/auth-config"
 import { AppError } from "../../../shared/http/app-error"
 import { requireAuth } from "../../../shared/http/require-auth"
-import { updateMyProfile, uploadMyAvatar } from "../controllers/users-controller"
+import { updateMyPassword, updateMyProfile, uploadMyAvatar } from "../controllers/users-controller"
 
 const usersRoutes = Router()
 
@@ -57,6 +57,7 @@ function uploadAvatarMiddleware(req: Request, res: Response, next: NextFunction)
 
 usersRoutes.use(requireAuth)
 usersRoutes.patch("/users/me", updateMyProfile)
+usersRoutes.patch("/users/me/password", updateMyPassword)
 usersRoutes.post("/users/me/avatar", uploadAvatarMiddleware, uploadMyAvatar)
 
 export default usersRoutes
