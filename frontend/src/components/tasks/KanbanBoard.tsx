@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   closestCorners,
   DndContext,
@@ -23,7 +23,6 @@ import {
   getTaskId,
   moveTaskInBoard,
 } from "@/lib/tasks/kanban-board";
-import { toast } from "sonner";
 
 export function KanbanBoard() {
   const { columns, canReorderTasks, handleReorderTasksBoard } =
@@ -32,8 +31,6 @@ export function KanbanBoard() {
   const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
   const [isPersistingOrder, setIsPersistingOrder] = useState(false);
   const lastDragOverKeyRef = useRef<string | null>(null);
-  const persistToastIdRef = useRef<string | number | null>(null);
-  const persistToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -150,39 +147,6 @@ export function KanbanBoard() {
     setBoardColumns(columns);
     lastDragOverKeyRef.current = null;
   };
-
-  useEffect(() => {
-    if (isPersistingOrder) {
-      if (!persistToastTimerRef.current && !persistToastIdRef.current) {
-        persistToastTimerRef.current = setTimeout(() => {
-          persistToastIdRef.current = toast.loading("Salvando ordem do Kanban...");
-          persistToastTimerRef.current = null;
-        }, 450);
-      }
-      return;
-    }
-
-    if (persistToastTimerRef.current) {
-      clearTimeout(persistToastTimerRef.current);
-      persistToastTimerRef.current = null;
-    }
-
-    if (persistToastIdRef.current) {
-      toast.dismiss(persistToastIdRef.current);
-      persistToastIdRef.current = null;
-    }
-  }, [isPersistingOrder]);
-
-  useEffect(() => {
-    return () => {
-      if (persistToastTimerRef.current) {
-        clearTimeout(persistToastTimerRef.current);
-      }
-      if (persistToastIdRef.current) {
-        toast.dismiss(persistToastIdRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex flex-col gap-3">

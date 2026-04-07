@@ -5,12 +5,9 @@ import { toast } from "sonner"
 import { useTasksPageContext } from "@/lib/tasks/tasks-page-context"
 
 export function TasksPageFeedback() {
-  const { errorMessage, infoMessage, refreshData, viewState } = useTasksPageContext()
+  const { errorMessage, infoMessage, refreshData } = useTasksPageContext()
   const lastErrorRef = useRef<string | null>(null)
   const lastInfoRef = useRef<string | null>(null)
-  const loadingToastIdRef = useRef<string | number | null>(null)
-  const firstRefreshStartedRef = useRef(false)
-  const firstRefreshHandledRef = useRef(false)
 
   useEffect(() => {
     if (!errorMessage) {
@@ -44,37 +41,6 @@ export function TasksPageFeedback() {
     lastInfoRef.current = infoMessage
     toast.success(infoMessage)
   }, [infoMessage])
-
-  useEffect(() => {
-    if (!firstRefreshHandledRef.current) {
-      if (viewState.isRefreshing) {
-        firstRefreshStartedRef.current = true
-      } else if (firstRefreshStartedRef.current) {
-        firstRefreshHandledRef.current = true
-      }
-      return
-    }
-
-    if (viewState.isRefreshing) {
-      if (!loadingToastIdRef.current) {
-        loadingToastIdRef.current = toast.loading("Atualizando tarefas...")
-      }
-      return
-    }
-
-    if (loadingToastIdRef.current) {
-      toast.dismiss(loadingToastIdRef.current)
-      loadingToastIdRef.current = null
-    }
-  }, [viewState.isRefreshing])
-
-  useEffect(() => {
-    return () => {
-      if (loadingToastIdRef.current) {
-        toast.dismiss(loadingToastIdRef.current)
-      }
-    }
-  }, [])
 
   return null
 }
