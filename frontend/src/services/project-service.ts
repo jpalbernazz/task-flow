@@ -1,10 +1,10 @@
 import type { ProjectApiModel, ProjectCardItem, ProjectStatus } from "@/lib/projects/types"
+import { apiFetch, throwApiError, type ApiRequestContext } from "@/services/api-client"
 
 export type CreateProjectInput = Omit<ProjectCardItem, "id" | "members">
 export type UpdateProjectInput = Partial<Omit<ProjectCardItem, "id" | "members">>
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001"
-const PROJECTS_ENDPOINT = `${API_BASE_URL}/projects`
+const PROJECTS_ENDPOINT = "/projects"
 
 interface ProjectWritePayload {
   name: string
@@ -78,23 +78,11 @@ function buildProjectEndpoint(id?: number): string {
   return `${PROJECTS_ENDPOINT}/${id}`
 }
 
-async function throwApiError(response: Response, fallbackMessage: string): Promise<never> {
-  let message = fallbackMessage
-
-  try {
-    const data = (await response.json()) as { error?: string }
-    if (typeof data.error === "string" && data.error.trim() !== "") {
-      message = data.error
-    }
-  } catch {
-    // Keep fallback message when response body is empty or invalid JSON.
-  }
-
-  throw new Error(message)
-}
-
-export async function getProjectCards(): Promise<ProjectCardItem[]> {
-  const response = await fetch(buildProjectEndpoint(), { cache: "no-store" })
+export async function getProjectCards(context: ApiRequestContext = {}): Promise<ProjectCardItem[]> {
+  const response = await apiFetch(buildProjectEndpoint(), {
+    cache: "no-store",
+    requestHeaders: context.requestHeaders,
+  })
   if (!response.ok) {
     await throwApiError(response, "failed to fetch projects")
   }
@@ -104,7 +92,7 @@ export async function getProjectCards(): Promise<ProjectCardItem[]> {
 }
 
 export async function createProject(input: CreateProjectInput): Promise<ProjectCardItem> {
-  const response = await fetch(buildProjectEndpoint(), {
+  const response = await apiFetch(buildProjectEndpoint(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(toProjectWritePayload(input)),
@@ -118,7 +106,7 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectC
 }
 
 export async function updateProject(id: number, input: UpdateProjectInput): Promise<ProjectCardItem | null> {
-  const response = await fetch(buildProjectEndpoint(id), {
+  const response = await apiFetch(buildProjectEndpoint(id), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(toProjectUpdatePayload(input)),
@@ -136,7 +124,7 @@ export async function updateProject(id: number, input: UpdateProjectInput): Prom
 }
 
 export async function deleteProject(id: number): Promise<boolean> {
-  const response = await fetch(buildProjectEndpoint(id), { method: "DELETE" })
+  const response = await apiFetch(buildProjectEndpoint(id), { method: "DELETE" })
   if (response.status === 404) {
     return false
   }

@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { requireServerAuth } from "@/lib/auth/server-auth"
 import { TaskDetailsModal } from "@/components/tasks/TaskDetailsModal"
 import { TasksKanbanClient } from "@/components/tasks/TasksKanbanClient"
 import { TasksPageFeedback } from "@/components/tasks/TasksPageFeedback"
@@ -10,12 +11,16 @@ import { getProjectCards } from "@/services/project-service"
 import { getTasks } from "@/services/task-service"
 
 export default async function TasksPage() {
+  const { user, requestHeaders } = await requireServerAuth()
   let initialTasks: TaskViewModel[] = []
   let initialProjects: ProjectCardItem[] = []
   let initialError: string | null = null
 
   try {
-    const [tasks, projects] = await Promise.all([getTasks(), getProjectCards()])
+    const [tasks, projects] = await Promise.all([
+      getTasks({ requestHeaders }),
+      getProjectCards({ requestHeaders }),
+    ])
     initialTasks = tasks
     initialProjects = projects
   } catch {
@@ -28,7 +33,7 @@ export default async function TasksPage() {
       initialProjects={initialProjects}
       initialError={initialError}
     >
-      <DashboardLayout>
+      <DashboardLayout initialUser={user}>
         <div className="flex flex-col gap-6">
           <TasksPageFeedback />
           <TasksPageHeader />

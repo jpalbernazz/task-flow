@@ -6,6 +6,7 @@ import type {
   TaskViewModel,
 } from "@/lib/tasks/types"
 import { buildKanbanColumns } from "@/lib/tasks/kanban-columns"
+import { apiFetch, throwApiError, type ApiRequestContext } from "@/services/api-client"
 
 export interface CreateTaskInput {
   title: string
@@ -18,8 +19,7 @@ export interface CreateTaskInput {
 
 export type UpdateTaskInput = Partial<CreateTaskInput>
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001"
-const TASKS_ENDPOINT = `${API_BASE_URL}/tasks`
+const TASKS_ENDPOINT = "/tasks"
 
 interface TaskWritePayload {
   title: string
@@ -74,23 +74,11 @@ function buildTaskEndpoint(id?: number): string {
   return `${TASKS_ENDPOINT}/${id}`
 }
 
-async function throwApiError(response: Response, fallbackMessage: string): Promise<never> {
-  let message = fallbackMessage
-
-  try {
-    const data = (await response.json()) as { error?: string }
-    if (typeof data.error === "string" && data.error.trim() !== "") {
-      message = data.error
-    }
-  } catch {
-    // Keep fallback message when response body is empty or invalid JSON.
-  }
-
-  throw new Error(message)
-}
-
-export async function getTasks(): Promise<TaskViewModel[]> {
-  const response = await fetch(buildTaskEndpoint(), { cache: "no-store" })
+export async function getTasks(context: ApiRequestContext = {}): Promise<TaskViewModel[]> {
+  const response = await apiFetch(buildTaskEndpoint(), {
+    cache: "no-store",
+    requestHeaders: context.requestHeaders,
+  })
   if (!response.ok) {
     await throwApiError(response, "failed to fetch tasks")
   }
@@ -99,7 +87,7 @@ export async function getTasks(): Promise<TaskViewModel[]> {
 }
 
 export async function createTask(input: CreateTaskInput): Promise<TaskViewModel> {
-  const response = await fetch(buildTaskEndpoint(), {
+  const response = await apiFetch(buildTaskEndpoint(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(toTaskWritePayload(input)),
@@ -112,7 +100,7 @@ export async function createTask(input: CreateTaskInput): Promise<TaskViewModel>
 }
 
 export async function updateTask(id: number, input: UpdateTaskInput): Promise<TaskViewModel | null> {
-  const response = await fetch(buildTaskEndpoint(id), {
+  const response = await apiFetch(buildTaskEndpoint(id), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(toTaskUpdatePayload(input)),
@@ -129,7 +117,7 @@ export async function updateTask(id: number, input: UpdateTaskInput): Promise<Ta
 }
 
 export async function deleteTask(id: number): Promise<boolean> {
-  const response = await fetch(buildTaskEndpoint(id), { method: "DELETE" })
+  const response = await apiFetch(buildTaskEndpoint(id), { method: "DELETE" })
   if (response.status === 404) {
     return false
   }
@@ -141,7 +129,7 @@ export async function deleteTask(id: number): Promise<boolean> {
 }
 
 export async function reorderTasks(input: ReorderTasksInput): Promise<void> {
-  const response = await fetch(`${TASKS_ENDPOINT}/reorder`, {
+  const response = await apiFetch(`${TASKS_ENDPOINT}/reorder`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),

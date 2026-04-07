@@ -2,8 +2,11 @@ import { LoginPageBrand } from "@/components/auth/LoginPageBrand"
 import { LoginPageFormCard } from "@/components/auth/LoginPageFormCard"
 import { LoginPageShell } from "@/components/auth/LoginPageShell"
 import { LoginPageProvider } from "@/lib/auth/login-page-context"
+import { redirectAuthenticatedUserToDashboard } from "@/lib/auth/server-auth"
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  await redirectAuthenticatedUserToDashboard()
+
   return (
     <LoginPageProvider>
       <LoginPageShell>

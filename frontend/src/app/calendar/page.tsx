@@ -6,23 +6,25 @@ import { CalendarSelectedDayPanel } from "@/components/calendar/CalendarSelected
 import { CalendarSummary } from "@/components/calendar/CalendarSummary"
 import { CalendarUpcomingDeadlines } from "@/components/calendar/CalendarUpcomingDeadlines"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { requireServerAuth } from "@/lib/auth/server-auth"
 import { CalendarPageProvider } from "@/lib/calendar/calendar-page-context"
 import type { CalendarTask } from "@/lib/calendar/types"
 import { getCalendarTasks } from "@/services/calendar-service"
 
 export default async function CalendarPage() {
+  const { user, requestHeaders } = await requireServerAuth()
   let initialTasks: CalendarTask[] = []
   let initialError: string | null = null
 
   try {
-    initialTasks = await getCalendarTasks()
+    initialTasks = await getCalendarTasks({ requestHeaders })
   } catch {
     initialError = "Não foi possível carregar as tarefas do calendário na inicialização."
   }
 
   return (
     <CalendarPageProvider initialTasks={initialTasks} initialError={initialError}>
-      <DashboardLayout>
+      <DashboardLayout initialUser={user}>
         <div className="flex flex-col gap-6 lg:gap-8">
           <CalendarPageFeedback />
           <CalendarPageHeader />

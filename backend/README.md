@@ -40,6 +40,12 @@ Uso no DBeaver:
 
 ## Endpoints
 
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/logout`
+- `GET /auth/me`
+- `POST /auth/forgot-password`
+- `POST /auth/reset-password`
 - `GET /tasks`
 - `POST /tasks`
 - `PUT /tasks/:id`
@@ -48,6 +54,34 @@ Uso no DBeaver:
 - `POST /projects`
 - `PUT /projects/:id`
 - `DELETE /projects/:id`
+- `PATCH /users/me`
+- `POST /users/me/avatar`
+
+## Modelo de Workspace
+
+- Este MVP usa **workspace compartilhado** por instância.
+- Todos os usuários autenticados veem e gerenciam o mesmo conjunto de `tasks` e `projects`.
+- Não existe autorização por proprietário (`owner`) nesta fase.
+
+## Usuário padrão para desenvolvimento
+
+Após `npm run db:setup`, o seed cria:
+
+- email: `admin@taskflow.local`
+- senha: `admin123`
+
+## Sessão e upload
+
+- A autenticação usa cookie HTTP-only de sessão.
+- Cadastro cria conta pronta para login.
+- Rotas de `tasks`, `projects` e `users` exigem autenticação (`401` sem sessão válida).
+- O upload de avatar usa `multipart/form-data` com campo `avatar`.
+- Arquivos de avatar ficam em `backend/uploads/avatars` e são servidos em `/uploads/avatars/*`.
+
+## Recuperação de senha
+
+- `POST /auth/forgot-password` retorna `resetUrl` para uso local no frontend.
+- `RESET_PASSWORD_TTL_MINUTES` define a expiração do token de redefinição.
 
 ## Contrato de Tasks
 
