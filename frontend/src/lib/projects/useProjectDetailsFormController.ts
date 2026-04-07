@@ -1,146 +1,133 @@
-import { useEffect, useMemo, useState } from "react"
-import { getErrorMessage } from "@/lib/get-error-message"
-import { isValidDate } from "@/lib/is-valid-date"
-import { projectStatusConfig } from "@/lib/projects/project-status"
+import { useEffect, useMemo, useState } from "react";
+import { getErrorMessage } from "@/lib/get-error-message";
+import { isValidDate } from "@/lib/is-valid-date";
+import { projectStatusConfig } from "@/lib/projects/project-status";
 import type {
   ProjectCardItem,
   ProjectFormValues,
-  ProjectModalIntent,
   ProjectModalMode,
   ProjectStatus,
-} from "@/lib/projects/types"
-import type { CreateProjectInput, UpdateProjectInput } from "@/services/project-service"
+} from "@/lib/projects/types";
+import type {
+  CreateProjectInput,
+  UpdateProjectInput,
+} from "@/services/project-service";
 
 interface UseProjectDetailsFormControllerParams {
-  open: boolean
-  mode: ProjectModalMode
-  initialIntent?: ProjectModalIntent
-  project: ProjectCardItem | null
-  onOpenChange: (open: boolean) => void
-  onCreate: (input: CreateProjectInput) => Promise<void>
-  onUpdate: (projectId: number, input: UpdateProjectInput) => Promise<void>
+  open: boolean;
+  mode: ProjectModalMode;
+  project: ProjectCardItem | null;
+  onOpenChange: (open: boolean) => void;
+  onCreate: (input: CreateProjectInput) => Promise<void>;
+  onUpdate: (projectId: number, input: UpdateProjectInput) => Promise<void>;
 }
 
 function buildDefaultFormValues(): ProjectFormValues {
-  const nextMonth = new Date()
-  nextMonth.setDate(nextMonth.getDate() + 30)
+  const nextMonth = new Date();
+  nextMonth.setDate(nextMonth.getDate() + 30);
 
   return {
     name: "Novo Projeto",
-    description: "Descricao do novo projeto",
+    description: "Descrição do novo projeto",
     deadline: nextMonth.toISOString().slice(0, 10),
     status: "planejado",
+  };
+}
+
+function normalizeDateOnly(value: string): string {
+  if (!value) {
+    return value;
   }
+
+  const [datePart] = value.split("T");
+  return datePart;
 }
 
 function projectToFormValues(project: ProjectCardItem): ProjectFormValues {
   return {
     name: project.name,
     description: project.description,
-    deadline: project.deadline,
+    deadline: normalizeDateOnly(project.deadline),
     status: project.status,
-  }
+  };
 }
 
 export function useProjectDetailsFormController({
   open,
   mode,
-  initialIntent = "view",
   project,
   onOpenChange,
   onCreate,
   onUpdate,
 }: UseProjectDetailsFormControllerParams) {
-  const [isEditing, setIsEditing] = useState(mode === "create")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [formValues, setFormValues] = useState<ProjectFormValues>(buildDefaultFormValues)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [formValues, setFormValues] = useState<ProjectFormValues>(
+    buildDefaultFormValues,
+  );
 
   const statusEntries = useMemo(() => {
     return Object.entries(projectStatusConfig) as Array<
       [ProjectStatus, { label: string; className: string }]
-    >
-  }, [])
+    >;
+  }, []);
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
 
     if (mode === "create") {
-      setFormValues(buildDefaultFormValues())
-      setIsEditing(true)
+      setFormValues(buildDefaultFormValues());
     } else if (project) {
-      setFormValues(projectToFormValues(project))
-      setIsEditing(initialIntent === "edit")
+      setFormValues(projectToFormValues(project));
     }
 
-    setSubmitError(null)
-  }, [open, mode, project, initialIntent])
+    setSubmitError(null);
+  }, [open, mode, project]);
 
-  const modalTitle =
-    mode === "create"
-      ? "Novo Projeto"
-      : isEditing
-        ? "Editar Projeto"
-        : "Detalhes do Projeto"
+  const modalTitle = mode === "create" ? "Novo Projeto" : "Editar Projeto";
 
   const modalDescription =
     mode === "create"
       ? "Preencha os dados principais para criar um novo projeto."
-      : isEditing
-        ? "Atualize os dados principais do projeto."
-        : "Visualize as informacoes consolidadas do projeto."
+      : "Atualize os dados principais do projeto.";
 
   const handleChange = <K extends keyof ProjectFormValues>(
     field: K,
     value: ProjectFormValues[K],
   ) => {
-    setFormValues((current) => ({ ...current, [field]: value }))
-  }
-
-  const handleCancelEditing = () => {
-    if (!project) {
-      return
-    }
-
-    setFormValues(projectToFormValues(project))
-    setSubmitError(null)
-    setIsEditing(false)
-  }
+    setFormValues((current) => ({ ...current, [field]: value }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    if (!isEditing && mode === "view") {
-      return
-    }
-
-    const normalizedName = formValues.name.trim()
-    const normalizedDescription = formValues.description.trim()
+    const normalizedName = formValues.name.trim();
+    const normalizedDescription = formValues.description.trim();
 
     if (normalizedName === "") {
-      setSubmitError("O nome do projeto e obrigatorio.")
-      return
+      setSubmitError("O nome do projeto e obrigatorio.");
+      return;
     }
 
     if (normalizedDescription === "") {
-      setSubmitError("A descricao do projeto e obrigatoria.")
-      return
+      setSubmitError("A descrição do projeto e obrigatoria.");
+      return;
     }
 
     if (!isValidDate(formValues.deadline)) {
-      setSubmitError("Informe um prazo valido.")
-      return
+      setSubmitError("Informe um prazo valido.");
+      return;
     }
 
     if (!(formValues.status in projectStatusConfig)) {
-      setSubmitError("Selecione um status valido.")
-      return
+      setSubmitError("Selecione um status valido.");
+      return;
     }
 
-    setSubmitError(null)
-    setIsSubmitting(true)
+    setSubmitError(null);
+    setIsSubmitting(true);
 
     try {
       if (mode === "create") {
@@ -152,31 +139,29 @@ export function useProjectDetailsFormController({
           progress: 0,
           tasksCompleted: 0,
           totalTasks: 0,
-        })
+        });
       } else if (project) {
         await onUpdate(project.id, {
           name: normalizedName,
           description: normalizedDescription,
           deadline: formValues.deadline,
           status: formValues.status,
-        })
+        });
       }
 
-      onOpenChange(false)
+      onOpenChange(false);
     } catch (error) {
       const fallback =
         mode === "create"
           ? "Nao foi possivel criar o projeto."
-          : "Nao foi possivel atualizar o projeto."
-      setSubmitError(getErrorMessage(error, fallback))
+          : "Nao foi possivel atualizar o projeto.";
+      setSubmitError(getErrorMessage(error, fallback));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return {
-    isEditing,
-    setIsEditing,
     isSubmitting,
     submitError,
     formValues,
@@ -184,7 +169,6 @@ export function useProjectDetailsFormController({
     modalTitle,
     modalDescription,
     handleChange,
-    handleCancelEditing,
     handleSubmit,
-  }
+  };
 }

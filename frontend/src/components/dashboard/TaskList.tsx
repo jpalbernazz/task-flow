@@ -7,16 +7,16 @@ import type {
   RecentTaskStatus,
 } from "@/lib/dashboard/types"
 import { useDashboardPageContext } from "@/lib/dashboard/dashboard-page-context"
-import { Badge } from "@/components/ui/Badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoreHorizontal, Clock } from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu"
+} from "@/components/ui/dropdown-menu"
 
 const statusConfig: Record<RecentTaskStatus, { label: string; className: string }> = {
   todo: {

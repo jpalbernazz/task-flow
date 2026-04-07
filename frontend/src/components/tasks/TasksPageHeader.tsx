@@ -1,7 +1,7 @@
 "use client"
 
 import { Filter, Plus } from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import {
   Combobox,
   ComboboxCollection,
@@ -11,8 +11,8 @@ import {
   ComboboxItem,
   ComboboxList,
   useComboboxAnchor,
-} from "@/components/ui/Combobox"
-import { InputGroupAddon } from "@/components/ui/InputGroup"
+} from "@/components/ui/combobox"
+import { InputGroupAddon } from "@/components/ui/input-group"
 import type { ProjectFilterOption } from "@/lib/tasks/useTasksPageController"
 import { useTasksPageContext } from "@/lib/tasks/tasks-page-context"
 

@@ -3,11 +3,11 @@ import { getErrorMessage } from "@/lib/get-error-message"
 import { projectStatusConfig } from "@/lib/projects/project-status"
 import type {
   ProjectCardItem,
-  ProjectModalIntent,
   ProjectModalMode,
 } from "@/lib/projects/types"
 import {
   createProject,
+  deleteProject,
   getProjectCards,
   type CreateProjectInput,
   type UpdateProjectInput,
@@ -38,7 +38,6 @@ export function useProjectsPageController({
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<ProjectModalMode>("create")
-  const [modalIntent, setModalIntent] = useState<ProjectModalIntent>("view")
   const [selectedProject, setSelectedProject] = useState<ProjectCardItem | null>(null)
 
   const refreshProjects = useCallback(async () => {
@@ -114,32 +113,47 @@ export function useProjectsPageController({
     [refreshProjects],
   )
 
+  const handleDeleteProjectFromModal = useCallback(
+    async (projectId: number) => {
+      try {
+        const deleted = await deleteProject(projectId)
+        if (!deleted) {
+          const notFoundError = new Error("O projeto nao foi encontrado para exclusao.")
+          setErrorMessage(notFoundError.message)
+          throw notFoundError
+        }
+
+        setInfoMessage("Projeto excluido com sucesso.")
+        setErrorMessage(null)
+        await refreshProjects()
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir o projeto."))
+        throw error
+      }
+    },
+    [refreshProjects],
+  )
+
   const handleModalOpenChange = useCallback((open: boolean) => {
     setIsModalOpen(open)
 
     if (!open) {
       setSelectedProject(null)
       setModalMode("create")
-      setModalIntent("view")
     }
   }, [])
 
   const handleOpenCreateModal = useCallback(() => {
     setSelectedProject(null)
     setModalMode("create")
-    setModalIntent("edit")
     setIsModalOpen(true)
   }, [])
 
-  const handleOpenProjectModal = useCallback(
-    (project: ProjectCardItem, intent: ProjectModalIntent) => {
-      setSelectedProject(project)
-      setModalMode("view")
-      setModalIntent(intent)
-      setIsModalOpen(true)
-    },
-    [],
-  )
+  const handleOpenProjectModal = useCallback((project: ProjectCardItem) => {
+    setSelectedProject(project)
+    setModalMode("view")
+    setIsModalOpen(true)
+  }, [])
 
   const viewState = useMemo(
     () => ({
@@ -161,13 +175,13 @@ export function useProjectsPageController({
     refreshProjects,
     isModalOpen,
     modalMode,
-    modalIntent,
     selectedProject,
     handleModalOpenChange,
     handleOpenCreateModal,
     handleOpenProjectModal,
     handleCreateProject,
     handleUpdateProject,
+    handleDeleteProjectFromModal,
     viewState,
   }
 }

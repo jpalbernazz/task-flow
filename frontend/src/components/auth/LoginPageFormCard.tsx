@@ -2,10 +2,10 @@
 
 import Link from "next/link"
 import { ArrowRight, Lock, Mail } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Input } from "@/components/ui/Input"
-import { Label } from "@/components/ui/Label"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useLoginPageContext } from "@/lib/auth/login-page-context"
 
 export function LoginPageFormCard() {

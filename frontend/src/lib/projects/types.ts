@@ -5,7 +5,6 @@ export interface ProjectMember {
 
 export type ProjectStatus = "planejado" | "em-andamento" | "concluido" | "atrasado"
 export type ProjectModalMode = "create" | "view"
-export type ProjectModalIntent = "view" | "edit"
 
 export interface ProjectApiModel {
   id: number

@@ -1,19 +1,29 @@
 "use client"
 
-import type { DragEvent, KeyboardEvent } from "react"
+import { useState, type DragEvent, type KeyboardEvent } from "react"
 import { Calendar, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTasksPageContext } from "@/lib/tasks/tasks-page-context"
 import type { TaskViewModel } from "@/lib/tasks/types"
-import { Badge } from "@/components/ui/Badge"
-import { Card, CardContent } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu"
+} from "@/components/ui/dropdown-menu"
 import { taskPriorityConfig } from "@/lib/tasks/task-meta"
 
 interface TaskCardProps {
@@ -39,6 +49,8 @@ function formatShortDate(dateString: string) {
 
 export function TaskCard({ task, dragDataTransferType }: TaskCardProps) {
   const { handleDeleteTask, handleOpenEditTaskModal, getProjectName } = useTasksPageContext()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const priority = taskPriorityConfig[task.priority]
   const projectName = getProjectName(task.projectId)
 
@@ -91,9 +103,7 @@ export function TaskCard({ task, dragDataTransferType }: TaskCardProps) {
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
-                onSelect={() => {
-                  void handleDeleteTask(task.id)
-                }}
+                onSelect={() => setIsDeleteDialogOpen(true)}
               >
                 Excluir
               </DropdownMenuItem>
@@ -121,6 +131,43 @@ export function TaskCard({ task, dragDataTransferType }: TaskCardProps) {
           </div>
         </div>
       </CardContent>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!isDeleting) {
+            setIsDeleteDialogOpen(open)
+          }
+        }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir tarefa</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acao remove a tarefa permanentemente. Deseja continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isDeleting}
+              onClick={async (event) => {
+                event.preventDefault()
+                setIsDeleting(true)
+                try {
+                  await handleDeleteTask(task.id)
+                  setIsDeleteDialogOpen(false)
+                } finally {
+                  setIsDeleting(false)
+                }
+              }}
+            >
+              {isDeleting ? "Excluindo..." : "Confirmar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { useProjectsPageContext } from "@/lib/projects/projects-page-context"
 
 export function ProjectsPageFeedback() {

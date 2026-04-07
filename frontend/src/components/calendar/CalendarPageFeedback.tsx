@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { useCalendarPageContext } from "@/lib/calendar/calendar-page-context"
 
 export function CalendarPageFeedback() {
