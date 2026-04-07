@@ -26,8 +26,8 @@ export function LoginPageFormCard() {
   } = useLoginPageContext();
 
   return (
-    <Card className="border-border/50 shadow-xl shadow-primary/5">
-      <CardHeader className="pb-2 text-center">
+    <Card className="border-border/50 shadow-xl shadow-primary/5 mt-5">
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl font-semibold">
           Bem-vindo de volta
         </CardTitle>
@@ -35,7 +35,7 @@ export function LoginPageFormCard() {
           Entre com suas credenciais para acessar sua conta
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="email" className="text-sm font-medium">

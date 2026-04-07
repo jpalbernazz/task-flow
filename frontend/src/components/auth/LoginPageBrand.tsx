@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function LoginPageBrand() {
   return (
-    <div className="mb-8 flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-2">
       <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-border/70 bg-muted/40 shadow-sm">
         <Image
           src="/icon.svg"

@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ArrowRight, Lock, Mail, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useRegisterPageContext } from "@/lib/auth/register-page-context"
+import Link from "next/link";
+import { ArrowRight, Lock, Mail, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRegisterPageContext } from "@/lib/auth/register-page-context";
 
 export function RegisterPageFormCard() {
   const {
@@ -22,21 +28,24 @@ export function RegisterPageFormCard() {
     setPassword,
     setConfirmPassword,
     handleSubmit,
-  } = useRegisterPageContext()
+  } = useRegisterPageContext();
 
   return (
-    <Card className="border-border/50 shadow-xl shadow-primary/5">
-      <CardHeader className="pb-2 text-center">
+    <Card className="border-border/50 shadow-xl shadow-primary/5 mt-5">
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl font-semibold">Criar conta</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Cadastre-se para entrar no workspace compartilhado de projetos e tarefas.
+          Cadastre-se para entrar no workspace compartilhado de projetos e
+          tarefas.
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="pt-4">
+      <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-sm font-medium">Nome</Label>
+            <Label htmlFor="name" className="text-sm font-medium">
+              Nome
+            </Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -52,7 +61,9 @@ export function RegisterPageFormCard() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -68,7 +79,9 @@ export function RegisterPageFormCard() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+            <Label htmlFor="password" className="text-sm font-medium">
+              Senha
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -85,7 +98,9 @@ export function RegisterPageFormCard() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="confirm-password" className="text-sm font-medium">Confirmar senha</Label>
+            <Label htmlFor="confirm-password" className="text-sm font-medium">
+              Confirmar senha
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -113,7 +128,11 @@ export function RegisterPageFormCard() {
             </p>
           ) : null}
 
-          <Button type="submit" className="h-11 w-full gap-2 text-base font-medium" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="h-11 w-full gap-2 text-base font-medium"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
             ) : (
@@ -127,11 +146,14 @@ export function RegisterPageFormCard() {
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Já tem conta?{" "}
-          <Link href="/login" className="font-medium text-primary transition-colors hover:text-primary/80">
+          <Link
+            href="/login"
+            className="font-medium text-primary transition-colors hover:text-primary/80"
+          >
             Entrar
           </Link>
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }
