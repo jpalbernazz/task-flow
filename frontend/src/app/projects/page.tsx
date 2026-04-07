@@ -1,26 +1,29 @@
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
-import { ProjectDetailsModal } from "@/components/projects/ProjectDetailsModal"
-import { ProjectsGrid } from "@/components/projects/ProjectsGrid"
-import { ProjectsPageFeedback } from "@/components/projects/ProjectsPageFeedback"
-import { ProjectsPageHeader } from "@/components/projects/ProjectsPageHeader"
-import { ProjectsPageProvider } from "@/lib/projects/projects-page-context"
-import type { ProjectCardItem } from "@/lib/projects/types"
-import { getProjectCards } from "@/services/project-service"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { ProjectDetailsModal } from "@/components/projects/ProjectDetailsModal";
+import { ProjectsGrid } from "@/components/projects/ProjectsGrid";
+import { ProjectsPageFeedback } from "@/components/projects/ProjectsPageFeedback";
+import { ProjectsPageHeader } from "@/components/projects/ProjectsPageHeader";
+import { ProjectsPageProvider } from "@/lib/projects/projects-page-context";
+import type { ProjectCardItem } from "@/lib/projects/types";
+import { getProjectCards } from "@/services/project-service";
 
 export default async function ProjectsPage() {
-  let initialProjects: ProjectCardItem[] = []
-  let initialError: string | null = null
+  let initialProjects: ProjectCardItem[] = [];
+  let initialError: string | null = null;
 
   try {
-    initialProjects = await getProjectCards()
+    initialProjects = await getProjectCards();
   } catch {
-    initialError = "Nao foi possivel carregar os projetos na inicializacao."
+    initialError = "Nao foi possivel carregar os projetos na inicializacao.";
   }
 
   return (
-    <ProjectsPageProvider initialProjects={initialProjects} initialError={initialError}>
+    <ProjectsPageProvider
+      initialProjects={initialProjects}
+      initialError={initialError}
+    >
       <DashboardLayout>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:gap-6 gap-4">
           <ProjectsPageFeedback />
           <ProjectsPageHeader />
           <ProjectsGrid />
@@ -29,5 +32,5 @@ export default async function ProjectsPage() {
         <ProjectDetailsModal />
       </DashboardLayout>
     </ProjectsPageProvider>
-  )
+  );
 }

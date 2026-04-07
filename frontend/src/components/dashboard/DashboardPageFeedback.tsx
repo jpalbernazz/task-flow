@@ -1,41 +1,80 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { useEffect, useRef } from "react"
+import { toast } from "sonner"
 import { useDashboardPageContext } from "@/lib/dashboard/dashboard-page-context"
 
 export function DashboardPageFeedback() {
-  const {
-    errorMessage,
-    infoMessage,
-    refreshDashboard,
-    viewState,
-  } = useDashboardPageContext()
+  const { errorMessage, infoMessage, refreshDashboard, viewState } = useDashboardPageContext()
+  const lastErrorRef = useRef<string | null>(null)
+  const lastInfoRef = useRef<string | null>(null)
+  const loadingToastIdRef = useRef<string | number | null>(null)
+  const firstRefreshStartedRef = useRef(false)
+  const firstRefreshHandledRef = useRef(false)
 
-  return (
-    <>
-      {viewState.hasError ? (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span>{errorMessage}</span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => void refreshDashboard()}
-              disabled={viewState.isRefreshing}
-            >
-              Tentar novamente
-            </Button>
-          </div>
-        </div>
-      ) : null}
+  useEffect(() => {
+    if (!errorMessage) {
+      lastErrorRef.current = null
+      return
+    }
 
-      {viewState.hasInfo ? (
-        <div className="rounded-lg border border-success/30 bg-success/10 p-3 text-sm text-success">
-          {infoMessage}
-        </div>
-      ) : null}
+    if (lastErrorRef.current === errorMessage) {
+      return
+    }
 
-      {viewState.isRefreshing ? <p className="text-sm text-muted-foreground">Carregando painel...</p> : null}
-    </>
-  )
+    lastErrorRef.current = errorMessage
+    toast.error(errorMessage, {
+      action: {
+        label: "Tentar novamente",
+        onClick: () => void refreshDashboard(),
+      },
+    })
+  }, [errorMessage, refreshDashboard])
+
+  useEffect(() => {
+    if (!infoMessage) {
+      lastInfoRef.current = null
+      return
+    }
+
+    if (lastInfoRef.current === infoMessage) {
+      return
+    }
+
+    lastInfoRef.current = infoMessage
+    toast.success(infoMessage)
+  }, [infoMessage])
+
+  useEffect(() => {
+    if (!firstRefreshHandledRef.current) {
+      if (viewState.isRefreshing) {
+        firstRefreshStartedRef.current = true
+      } else if (firstRefreshStartedRef.current) {
+        firstRefreshHandledRef.current = true
+      }
+      return
+    }
+
+    if (viewState.isRefreshing) {
+      if (!loadingToastIdRef.current) {
+        loadingToastIdRef.current = toast.loading("Carregando painel...")
+      }
+      return
+    }
+
+    if (loadingToastIdRef.current) {
+      toast.dismiss(loadingToastIdRef.current)
+      loadingToastIdRef.current = null
+    }
+  }, [viewState.isRefreshing])
+
+  useEffect(() => {
+    return () => {
+      if (loadingToastIdRef.current) {
+        toast.dismiss(loadingToastIdRef.current)
+      }
+    }
+  }, [])
+
+  return null
 }

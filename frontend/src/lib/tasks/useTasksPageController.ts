@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { getErrorMessage } from "@/lib/get-error-message"
 import type { ProjectCardItem } from "@/lib/projects/types"
-import type { KanbanColumnData, TaskModalMode, TaskStatus, TaskViewModel } from "@/lib/tasks/types"
+import type { KanbanColumnData, TaskModalMode, TaskViewModel } from "@/lib/tasks/types"
+import { buildKanbanColumns } from "@/lib/tasks/kanban-columns"
 import { getProjectCards } from "@/services/project-service"
 import {
   createTask,
@@ -12,19 +13,6 @@ import {
   type UpdateTaskInput,
   updateTask,
 } from "@/services/task-service"
-
-const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
-  { id: "todo", title: "A Fazer", color: "bg-muted-foreground/70" },
-  { id: "in_progress", title: "Em Progresso", color: "bg-primary" },
-  { id: "done", title: "Concluida", color: "bg-success" },
-]
-
-function buildKanbanColumns(tasks: TaskViewModel[]): KanbanColumnData[] {
-  return baseColumns.map((column) => ({
-    ...column,
-    tasks: tasks.filter((task) => task.status === column.id),
-  }))
-}
 
 export interface ProjectFilterOption {
   value: string
@@ -63,6 +51,7 @@ export function useTasksPageController({
       setErrorMessage(null)
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar as tarefas."))
+      setInfoMessage(null)
     } finally {
       setIsRefreshing(false)
     }
@@ -122,24 +111,8 @@ export function useTasksPageController({
         await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel criar a tarefa."))
+        setInfoMessage(null)
         throw error
-      }
-    },
-    [refreshData],
-  )
-
-  const handleMoveTask = useCallback(
-    async (taskId: number, status: TaskStatus) => {
-      try {
-        const updatedTask = await updateTask(taskId, { status })
-        if (!updatedTask) {
-          setErrorMessage("A tarefa nao foi encontrada para atualizar o status.")
-          return
-        }
-
-        await refreshData()
-      } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel atualizar o status da tarefa."))
       }
     },
     [refreshData],
@@ -151,6 +124,7 @@ export function useTasksPageController({
         const deleted = await deleteTask(taskId)
         if (!deleted) {
           setErrorMessage("A tarefa nao foi encontrada para exclusao.")
+          setInfoMessage(null)
           return
         }
 
@@ -159,6 +133,7 @@ export function useTasksPageController({
         await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
+        setInfoMessage(null)
       }
     },
     [refreshData],
@@ -171,6 +146,7 @@ export function useTasksPageController({
         if (!updatedTask) {
           const notFoundError = new Error("A tarefa nao foi encontrada para edicao.")
           setErrorMessage(notFoundError.message)
+          setInfoMessage(null)
           throw notFoundError
         }
 
@@ -179,6 +155,7 @@ export function useTasksPageController({
         await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel editar a tarefa."))
+        setInfoMessage(null)
         throw error
       }
     },
@@ -192,6 +169,7 @@ export function useTasksPageController({
         if (!deleted) {
           const notFoundError = new Error("A tarefa nao foi encontrada para exclusao.")
           setErrorMessage(notFoundError.message)
+          setInfoMessage(null)
           throw notFoundError
         }
 
@@ -200,6 +178,7 @@ export function useTasksPageController({
         await refreshData()
       } catch (error) {
         setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
+        setInfoMessage(null)
         throw error
       }
     },
@@ -240,6 +219,7 @@ export function useTasksPageController({
       } catch (error) {
         setTasks(previousTasks)
         setErrorMessage(getErrorMessage(error, "Nao foi possivel reordenar as tarefas."))
+        setInfoMessage(null)
         throw error
       }
     },
@@ -306,7 +286,6 @@ export function useTasksPageController({
     handleOpenCreateTaskModal,
     handleOpenEditTaskModal,
     handleCreateTask,
-    handleMoveTask,
     handleDeleteTask,
     handleUpdateTask,
     handleDeleteTaskFromModal,

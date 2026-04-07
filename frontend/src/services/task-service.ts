@@ -5,12 +5,7 @@ import type {
   TaskStatus,
   TaskViewModel,
 } from "@/lib/tasks/types"
-
-const baseColumns: Array<{ id: TaskStatus; title: string; color: string }> = [
-  { id: "todo", title: "A Fazer", color: "bg-muted-foreground/70" },
-  { id: "in_progress", title: "Em Progresso", color: "bg-primary" },
-  { id: "done", title: "Concluida", color: "bg-success" },
-]
+import { buildKanbanColumns } from "@/lib/tasks/kanban-columns"
 
 export interface CreateTaskInput {
   title: string
@@ -163,9 +158,5 @@ export async function getTaskViewModels(): Promise<TaskViewModel[]> {
 
 export async function getKanbanColumns(): Promise<KanbanColumnData[]> {
   const tasks = await getTasks()
-
-  return baseColumns.map((column) => ({
-    ...column,
-    tasks: tasks.filter((task) => task.status === column.id),
-  }))
+  return buildKanbanColumns(tasks)
 }
