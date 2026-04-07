@@ -40,6 +40,6 @@ export async function redirectAuthenticatedUserToDashboard(): Promise<void> {
   const user = await getCurrentUser({ requestHeaders })
 
   if (user) {
-    redirect("/")
+    redirect("/dashboard")
   }
 }

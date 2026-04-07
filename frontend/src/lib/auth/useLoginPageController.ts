@@ -17,7 +17,7 @@ export function useLoginPageController() {
       setIsSubmitting(true)
       setErrorMessage(null)
       await login({ email, password })
-      router.push("/")
+      router.push("/dashboard")
       router.refresh()
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Não foi possível fazer login."))

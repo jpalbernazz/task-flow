@@ -105,7 +105,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 Minha conta
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/configuracoes">
+                <Link href="/settings">
                   <Settings className="h-4 w-4" />
                   Configurações
                 </Link>
