@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { getErrorMessage } from "@/lib/get-error-message"
 import {
   buildCalendarDays,
@@ -61,10 +61,6 @@ export function useCalendarPageController({
       setIsRefreshing(false)
     }
   }, [])
-
-  useEffect(() => {
-    void refreshCalendarTasks()
-  }, [refreshCalendarTasks])
 
   const prevMonth = useCallback(() => {
     setCurrentDate(new Date(year, month - 1, 1))

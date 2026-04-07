@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { getErrorMessage } from "@/lib/get-error-message"
 import { projectStatusConfig } from "@/lib/projects/project-status"
 import type {
@@ -53,10 +53,6 @@ export function useProjectsPageController({
       setIsRefreshing(false)
     }
   }, [])
-
-  useEffect(() => {
-    void refreshProjects()
-  }, [refreshProjects])
 
   const filteredProjects = useMemo(() => {
     const normalizedSearch = normalizeSearchValue(searchTerm)

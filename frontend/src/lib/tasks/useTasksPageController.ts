@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { getErrorMessage } from "@/lib/get-error-message"
 import type { ProjectCardItem } from "@/lib/projects/types"
 import type { KanbanColumnData, TaskModalMode, TaskViewModel } from "@/lib/tasks/types"
@@ -21,15 +21,17 @@ export interface ProjectFilterOption {
 
 interface UseTasksPageControllerParams {
   initialTasks: TaskViewModel[]
+  initialProjects: ProjectCardItem[]
   initialError?: string | null
 }
 
 export function useTasksPageController({
   initialTasks,
+  initialProjects,
   initialError = null,
 }: UseTasksPageControllerParams) {
   const [tasks, setTasks] = useState<TaskViewModel[]>(initialTasks)
-  const [projects, setProjects] = useState<ProjectCardItem[]>([])
+  const [projects, setProjects] = useState<ProjectCardItem[]>(initialProjects)
   const [selectedProjectFilter, setSelectedProjectFilter] = useState("all")
   const [errorMessage, setErrorMessage] = useState<string | null>(initialError)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
@@ -56,10 +58,6 @@ export function useTasksPageController({
       setIsRefreshing(false)
     }
   }, [])
-
-  useEffect(() => {
-    void refreshData()
-  }, [refreshData])
 
   const projectsById = useMemo(() => {
     return projects.reduce<Record<number, ProjectCardItem>>((accumulator, project) => {
@@ -247,6 +245,21 @@ export function useTasksPageController({
     setIsTaskModalOpen(true)
   }, [])
 
+  const handleOpenEditTaskModalById = useCallback(
+    (taskId: number): boolean => {
+      const task = tasks.find((item) => item.id === taskId)
+      if (!task) {
+        return false
+      }
+
+      setTaskModalMode("edit")
+      setSelectedTask(task)
+      setIsTaskModalOpen(true)
+      return true
+    },
+    [tasks],
+  )
+
   const getProjectName = useCallback(
     (projectId: number | null) => {
       if (projectId === null) {
@@ -285,6 +298,7 @@ export function useTasksPageController({
     handleTaskModalOpenChange,
     handleOpenCreateTaskModal,
     handleOpenEditTaskModal,
+    handleOpenEditTaskModalById,
     handleCreateTask,
     handleDeleteTask,
     handleUpdateTask,

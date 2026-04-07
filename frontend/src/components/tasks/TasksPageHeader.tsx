@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Filter, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
@@ -17,6 +20,9 @@ import type { ProjectFilterOption } from "@/lib/tasks/useTasksPageController";
 import { useTasksPageContext } from "@/lib/tasks/tasks-page-context";
 
 export function TasksPageHeader() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const hasAutoOpenedFromQueryRef = useRef(false);
   const projectFilterAnchor = useComboboxAnchor();
 
   const {
@@ -25,7 +31,48 @@ export function TasksPageHeader() {
     projectFilterOptions,
     setSelectedProjectFilter,
     handleOpenCreateTaskModal,
+    handleOpenEditTaskModalById,
   } = useTasksPageContext();
+
+  const shouldAutoOpenCreateModal = searchParams.get("create") === "true";
+  const editTaskIdParam = searchParams.get("edit");
+
+  useEffect(() => {
+    if (hasAutoOpenedFromQueryRef.current) {
+      return;
+    }
+
+    if (editTaskIdParam !== null) {
+      hasAutoOpenedFromQueryRef.current = true;
+      const parsedTaskId = Number(editTaskIdParam);
+
+      if (!Number.isInteger(parsedTaskId) || parsedTaskId <= 0) {
+        toast.error("Não foi possível abrir a edição: tarefa inválida.");
+        router.replace("/tasks");
+        return;
+      }
+
+      const hasOpenedEditModal = handleOpenEditTaskModalById(parsedTaskId);
+      if (!hasOpenedEditModal) {
+        toast.error("Não foi possível abrir a edição: tarefa não encontrada.");
+      }
+
+      router.replace("/tasks");
+      return;
+    }
+
+    if (shouldAutoOpenCreateModal) {
+      hasAutoOpenedFromQueryRef.current = true;
+      handleOpenCreateTaskModal();
+      router.replace("/tasks");
+    }
+  }, [
+    editTaskIdParam,
+    handleOpenCreateTaskModal,
+    handleOpenEditTaskModalById,
+    router,
+    shouldAutoOpenCreateModal,
+  ]);
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

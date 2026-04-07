@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, type ReactNode } from "react"
+import type { ProjectCardItem } from "@/lib/projects/types"
 import type { TaskViewModel } from "@/lib/tasks/types"
 import { useTasksPageController } from "@/lib/tasks/useTasksPageController"
 
@@ -10,16 +11,18 @@ const TasksPageContext = createContext<TasksPageContextValue | null>(null)
 
 interface TasksPageProviderProps {
   initialTasks: TaskViewModel[]
+  initialProjects: ProjectCardItem[]
   initialError?: string | null
   children: ReactNode
 }
 
 export function TasksPageProvider({
   initialTasks,
+  initialProjects,
   initialError = null,
   children,
 }: TasksPageProviderProps) {
-  const value = useTasksPageController({ initialTasks, initialError })
+  const value = useTasksPageController({ initialTasks, initialProjects, initialError })
 
   return (
     <TasksPageContext.Provider value={value}>
