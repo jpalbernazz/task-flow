@@ -8,7 +8,7 @@ export function CalendarPageHeader() {
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-          Calendario
+          Calendário
         </h1>
         <p className="pl-0.5 text-muted-foreground">
           Visualize suas tarefas e prazos

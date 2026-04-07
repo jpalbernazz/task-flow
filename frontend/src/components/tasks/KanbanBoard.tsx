@@ -152,7 +152,7 @@ export function KanbanBoard() {
     <div className="flex flex-col gap-3">
       {!canReorderTasks ? (
         <div className="rounded-xl border border-dashed border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
-          Reordenacao de cards disponivel apenas em{" "}
+          Reordenação de cards disponível apenas em{" "}
           <span className="font-semibold text-foreground">
             Todos os projetos
           </span>

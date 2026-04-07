@@ -130,23 +130,23 @@ export function useTaskDetailsFormController({
     const normalizedDescription = formValues.description.trim();
 
     if (normalizedTitle === "") {
-      setSubmitError("O titulo da tarefa e obrigatorio.");
+      setSubmitError("O título da tarefa é obrigatório.");
       return;
     }
     if (normalizedDescription === "") {
-      setSubmitError("A descrição da tarefa e obrigatoria.");
+      setSubmitError("A descrição da tarefa é obrigatória.");
       return;
     }
     if (!isValidDate(formValues.dueDate)) {
-      setSubmitError("Informe uma data de prazo valida.");
+      setSubmitError("Informe uma data de prazo válida.");
       return;
     }
     if (!(formValues.status in taskStatusConfig)) {
-      setSubmitError("Selecione um status valido.");
+      setSubmitError("Selecione um status válido.");
       return;
     }
     if (!(formValues.priority in taskPriorityConfig)) {
-      setSubmitError("Selecione uma prioridade valida.");
+      setSubmitError("Selecione uma prioridade válida.");
       return;
     }
 
@@ -178,8 +178,8 @@ export function useTaskDetailsFormController({
     } catch (error) {
       const fallback =
         mode === "create"
-          ? "Nao foi possivel criar a tarefa."
-          : "Nao foi possivel atualizar a tarefa.";
+          ? "Não foi possível criar a tarefa."
+          : "Não foi possível atualizar a tarefa.";
       setSubmitError(getErrorMessage(error, fallback));
     } finally {
       setIsSubmitting(false);
@@ -199,7 +199,7 @@ export function useTaskDetailsFormController({
       onOpenChange(false);
     } catch (error) {
       setSubmitError(
-        getErrorMessage(error, "Nao foi possivel excluir a tarefa."),
+        getErrorMessage(error, "Não foi possível excluir a tarefa."),
       );
     } finally {
       setIsSubmitting(false);

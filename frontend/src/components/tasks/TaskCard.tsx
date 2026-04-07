@@ -129,7 +129,7 @@ function TaskCardComponent({
                 className="h-7 w-7 shrink-0"
               >
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Acoes da tarefa</span>
+                <span className="sr-only">Ações da tarefa</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -179,7 +179,7 @@ function TaskCardComponent({
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir tarefa</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acao remove a tarefa permanentemente. Deseja continuar?
+              Esta ação remove a tarefa permanentemente. Deseja continuar?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

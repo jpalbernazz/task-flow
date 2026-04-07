@@ -4,7 +4,7 @@ export const mockProjects: Project[] = [
   {
     id: 1,
     name: "Redesign do Site",
-    description: "Atualizacao visual e melhoria de UX do site principal.",
+    description: "Atualização visual e melhoria de UX do site principal.",
     ownerUserId: 1,
   },
   {
@@ -15,8 +15,8 @@ export const mockProjects: Project[] = [
   },
   {
     id: 3,
-    name: "Integracoes de API",
-    description: "Integracao com servicos externos e padronizacao de webhooks.",
+    name: "Integrações de API",
+    description: "Integração com serviços externos e padronização de webhooks.",
     ownerUserId: 3,
   },
 ]

@@ -32,7 +32,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
             <CheckSquare className="h-5 w-5 text-primary-foreground" />
           </div>
           <SheetTitle className="text-lg font-semibold text-sidebar-foreground">TaskFlow</SheetTitle>
-          <SheetDescription className="sr-only">Menu de navegacao principal</SheetDescription>
+          <SheetDescription className="sr-only">Menu de navegação principal</SheetDescription>
         </SheetHeader>
 
         <nav className="flex flex-1 flex-col gap-1 p-4">

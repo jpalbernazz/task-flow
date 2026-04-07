@@ -15,9 +15,9 @@ export function CalendarUpcomingDeadlines() {
 
   return (
     <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <h3 className="mb-4 font-semibold">Proximos Prazos</h3>
+      <h3 className="mb-4 font-semibold">Próximos Prazos</h3>
       {upcomingDeadlines.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nao ha prazos futuros cadastrados.</p>
+        <p className="text-sm text-muted-foreground">Não há prazos futuros cadastrados.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {upcomingDeadlines.map((task) => (

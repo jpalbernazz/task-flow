@@ -6,24 +6,24 @@
 2. `npm install`
 3. `npm run dev`
 
-## Estrutura por dominio
+## Estrutura por domínio
 
 - `src/modules/tasks/controllers` -> camada HTTP (request/response)
-- `src/modules/tasks/validators` -> validacao de payload e params
-- `src/modules/tasks/services` -> regras de negocio da feature
+- `src/modules/tasks/validators` -> validação de payload e params
+- `src/modules/tasks/services` -> regras de negócio da feature
 - `src/modules/tasks/repositories` -> acesso ao banco (SQL)
 - `src/modules/tasks/mappers` -> mapeamento entre entity (snake_case) e dto (camelCase)
 - `src/modules/tasks/types` -> contratos internos da feature
-- `src/shared/http` -> erro de aplicacao e middleware global
-- `src/database` -> conexao e scripts SQL versionados
+- `src/shared/http` -> erro de aplicação e middleware global
+- `src/database` -> conexão e scripts SQL versionados
 
 ## Banco de dados (PostgreSQL)
 
 Estrutura de scripts:
 
-- `src/database/migrations` -> criacao/evolucao de estrutura
+- `src/database/migrations` -> criação/evolução de estrutura
 - `src/database/seeds` -> dados iniciais
-- `src/database/scripts` -> utilitarios (ex: reset)
+- `src/database/scripts` -> utilitários (ex: reset)
 
 Comandos:
 
@@ -35,8 +35,8 @@ Comandos:
 
 Uso no DBeaver:
 
-- Para aplicacao manual, use `src/database/schema.sql`.
-- Para manter padrao do projeto, prefira executar os comandos npm acima.
+- Para aplicação manual, use `src/database/schema.sql`.
+- Para manter padrão do projeto, prefira executar os comandos npm acima.
 
 ## Endpoints
 
@@ -52,14 +52,14 @@ Uso no DBeaver:
 ## Contrato de Tasks
 
 API HTTP de tasks usa `camelCase`.
-`snake_case` e mantido apenas na camada de persistencia (banco/repositorio).
+`snake_case` é mantido apenas na camada de persistência (banco/repositório).
 
 Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
 
 ```json
 {
   "title": "Planejar sprint",
-  "description": "Definir backlog da proxima sprint",
+  "description": "Definir backlog da próxima sprint",
   "status": "todo",
   "priority": "high",
   "dueDate": "2026-04-10",
@@ -67,12 +67,12 @@ Payload de escrita para `POST /tasks` e `PUT /tasks/:id`:
 }
 ```
 
-`projectId` e opcional e aceita `null`.
+`projectId` é opcional e aceita `null`.
 
 ## Contrato de Projects
 
 API HTTP de projects usa `camelCase`.
-`snake_case` e mantido apenas na camada de persistencia (banco/repositorio).
+`snake_case` é mantido apenas na camada de persistência (banco/repositório).
 
 Payload de escrita para `POST /projects` e `PUT /projects/:id`:
 

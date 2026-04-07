@@ -17,7 +17,7 @@ export default async function CalendarPage() {
   try {
     initialTasks = await getCalendarTasks()
   } catch {
-    initialError = "Nao foi possivel carregar as tarefas do calendario na inicializacao."
+    initialError = "Não foi possível carregar as tarefas do calendário na inicialização."
   }
 
   return (

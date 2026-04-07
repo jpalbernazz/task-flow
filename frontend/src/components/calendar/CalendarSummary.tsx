@@ -21,10 +21,10 @@ export function CalendarSummary() {
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <SummaryCard label="Tarefas no mes" value={monthSummary.tasksInMonth} />
+      <SummaryCard label="Tarefas no mês" value={monthSummary.tasksInMonth} />
       <SummaryCard label="Dias com tarefas" value={monthSummary.daysWithTasks} />
-      <SummaryCard label="Atrasadas no mes" value={monthSummary.overdueTasks} />
-      <SummaryCard label="Proximas no mes" value={monthSummary.upcomingTasks} />
+      <SummaryCard label="Atrasadas no mês" value={monthSummary.overdueTasks} />
+      <SummaryCard label="Próximas no mês" value={monthSummary.upcomingTasks} />
     </div>
   )
 }

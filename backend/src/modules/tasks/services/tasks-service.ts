@@ -1,5 +1,9 @@
 import { AppError } from "../../../shared/http/app-error"
-import { findProjectById } from "../../projects/repositories/projects-repository"
+import {
+  findProjectById,
+  syncAllProjectMetrics,
+  syncProjectMetrics,
+} from "../../projects/repositories/projects-repository"
 import {
   createTaskDTOToEntityInput,
   entityToTaskDTO,
@@ -42,6 +46,9 @@ export async function createTask(input: CreateTaskDTO): Promise<TaskDTO> {
   const entityInput = createTaskDTOToEntityInput(input)
   entityInput.position = await getNextPositionForStatus(entityInput.status)
   const createdTask = await insertTask(entityInput)
+  if (createdTask.project_id !== null) {
+    await syncProjectMetrics(createdTask.project_id)
+  }
   return entityToTaskDTO(createdTask)
 }
 
@@ -66,13 +73,34 @@ export async function editTaskById(id: number, input: UpdateTaskDTO): Promise<Ta
     throw new AppError(404, "task not found")
   }
 
+  const projectIdsToSync = new Set<number>()
+  if (currentTask.project_id !== null) {
+    projectIdsToSync.add(currentTask.project_id)
+  }
+  if (updatedTask.project_id !== null) {
+    projectIdsToSync.add(updatedTask.project_id)
+  }
+
+  for (const projectId of projectIdsToSync) {
+    await syncProjectMetrics(projectId)
+  }
+
   return entityToTaskDTO(updatedTask)
 }
 
 export async function removeTaskById(id: number): Promise<void> {
+  const currentTask = await findTaskById(id)
+  if (!currentTask) {
+    throw new AppError(404, "task not found")
+  }
+
   const deleted = await deleteTask(id)
   if (!deleted) {
     throw new AppError(404, "task not found")
+  }
+
+  if (currentTask.project_id !== null) {
+    await syncProjectMetrics(currentTask.project_id)
   }
 }
 
@@ -100,4 +128,5 @@ export async function reorderTasksBoard(input: TaskReorderDTO): Promise<void> {
   )
 
   await bulkReorderTasks(updates)
+  await syncAllProjectMetrics()
 }

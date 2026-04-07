@@ -14,7 +14,7 @@ export function CalendarEmptyState() {
 
   return (
     <div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground shadow-sm">
-      Nenhuma tarefa encontrada. Crie tarefas com data para visualizar no calendario.
+      Nenhuma tarefa encontrada. Crie tarefas com data para visualizar no calendário.
     </div>
   )
 }

@@ -14,7 +14,7 @@ export default async function TasksPage() {
   try {
     initialTasks = await getTasks()
   } catch {
-    initialError = "Nao foi possivel carregar as tarefas na inicializacao."
+    initialError = "Não foi possível carregar as tarefas na inicialização."
   }
 
   return (

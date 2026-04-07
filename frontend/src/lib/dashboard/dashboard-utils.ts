@@ -54,7 +54,7 @@ function formatDueDateLabel(dueDate: string, todayDateKey: string): string {
   const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24))
 
   if (diffInDays === 1) {
-    return "Amanha"
+    return "Amanhã"
   }
 
   if (diffInDays === -1) {
@@ -117,7 +117,7 @@ export function buildDashboardStats(
       variant: "primary",
     },
     {
-      title: "Concluidas",
+      title: "Concluídas",
       value: completedTasks,
       description: "Tarefas finalizadas",
       icon: "check",

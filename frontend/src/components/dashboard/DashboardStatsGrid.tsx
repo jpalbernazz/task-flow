@@ -18,7 +18,7 @@ export function DashboardStatsGrid() {
   if (!viewState.isRefreshing && !viewState.hasError && stats.length === 0) {
     return (
       <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
-        Nenhum indicador disponivel no momento.
+        Nenhum indicador disponível no momento.
       </div>
     )
   }

@@ -56,7 +56,7 @@ export function useCalendarPageController({
       const tasks = await getCalendarTasks()
       setCalendarTasks(tasks)
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar as tarefas do calendario."))
+      setErrorMessage(getErrorMessage(error, "Não foi possível carregar as tarefas do calendário."))
     } finally {
       setIsRefreshing(false)
     }

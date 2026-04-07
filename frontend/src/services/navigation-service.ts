@@ -11,9 +11,9 @@ export const mainNavigationItems: NavigationItem[] = [
   { label: "Painel", href: "/", icon: LayoutDashboard },
   { label: "Projetos", href: "/projects", icon: FolderKanban },
   { label: "Tarefas", href: "/tasks", icon: CheckSquare },
-  { label: "Calendario", href: "/calendar", icon: Calendar },
+  { label: "Calendário", href: "/calendar", icon: Calendar },
 ];
 
 export const secondaryNavigationItems: NavigationItem[] = [
-  { label: "Configuracoes", href: "/configuracoes", icon: Settings },
+  { label: "Configurações", href: "/configuracoes", icon: Settings },
 ];

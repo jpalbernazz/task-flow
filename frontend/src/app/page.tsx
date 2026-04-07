@@ -17,7 +17,7 @@ export default async function DashboardPage() {
     initialStats = data.stats
     initialRecentTasks = data.recentTasks
   } catch {
-    initialError = "Nao foi possivel carregar os dados do painel na inicializacao."
+    initialError = "Não foi possível carregar os dados do painel na inicialização."
   }
 
   return (

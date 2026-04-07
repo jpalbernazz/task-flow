@@ -107,22 +107,22 @@ export function useProjectDetailsFormController({
     const normalizedDescription = formValues.description.trim();
 
     if (normalizedName === "") {
-      setSubmitError("O nome do projeto e obrigatorio.");
+      setSubmitError("O nome do projeto é obrigatório.");
       return;
     }
 
     if (normalizedDescription === "") {
-      setSubmitError("A descrição do projeto e obrigatoria.");
+      setSubmitError("A descrição do projeto é obrigatória.");
       return;
     }
 
     if (!isValidDate(formValues.deadline)) {
-      setSubmitError("Informe um prazo valido.");
+      setSubmitError("Informe um prazo válido.");
       return;
     }
 
     if (!(formValues.status in projectStatusConfig)) {
-      setSubmitError("Selecione um status valido.");
+      setSubmitError("Selecione um status válido.");
       return;
     }
 
@@ -153,8 +153,8 @@ export function useProjectDetailsFormController({
     } catch (error) {
       const fallback =
         mode === "create"
-          ? "Nao foi possivel criar o projeto."
-          : "Nao foi possivel atualizar o projeto.";
+          ? "Não foi possível criar o projeto."
+          : "Não foi possível atualizar o projeto.";
       setSubmitError(getErrorMessage(error, fallback));
     } finally {
       setIsSubmitting(false);

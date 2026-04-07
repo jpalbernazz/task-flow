@@ -28,7 +28,7 @@ const statusConfig: Record<RecentTaskStatus, { label: string; className: string 
     className: "bg-primary/10 text-primary",
   },
   completed: {
-    label: "Concluida",
+    label: "Concluída",
     className: "bg-success/10 text-success",
   },
   overdue: {
@@ -43,7 +43,7 @@ const priorityConfig: Record<RecentTaskPriority, { label: string; className: str
     className: "border-muted-foreground/30 text-muted-foreground",
   },
   medium: {
-    label: "Media",
+    label: "Média",
     className: "border-warning/50 text-warning",
   },
   high: {
@@ -110,7 +110,7 @@ function TaskRow({ task }: { task: RecentTaskItem }) {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Opcoes</span>
+            <span className="sr-only">Opções</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

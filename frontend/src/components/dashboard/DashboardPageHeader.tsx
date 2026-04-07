@@ -11,7 +11,7 @@ export function DashboardPageHeader() {
           Painel
         </h1>
         <p className="pl-0.5 text-muted-foreground">
-          Bem-vindo de volta. Aqui esta um resumo das suas tarefas.
+          Bem-vindo de volta. Aqui está um resumo das suas tarefas.
         </p>
       </div>
 

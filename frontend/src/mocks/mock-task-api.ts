@@ -3,7 +3,7 @@ import type { TaskViewModel } from "@/lib/tasks/types"
 export const mockTaskApi: TaskViewModel[] = [
   {
     id: 1,
-    title: "Mapear jornadas de usuario",
+    title: "Mapear jornadas de usuário",
     description: "Documentar os fluxos principais para o novo dashboard.",
     status: "todo",
     priority: "high",
@@ -14,7 +14,7 @@ export const mockTaskApi: TaskViewModel[] = [
   {
     id: 2,
     title: "Criar wireframes da home",
-    description: "Prototipo de baixa fidelidade da pagina inicial.",
+    description: "Protótipo de baixa fidelidade da página inicial.",
     status: "in_progress",
     priority: "medium",
     dueDate: "2026-04-09",

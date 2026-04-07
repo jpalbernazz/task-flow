@@ -37,7 +37,7 @@ function createColumns(): KanbanColumnData[] {
     },
     {
       id: "done",
-      title: "Concluida",
+      title: "Concluída",
       color: "bg-success",
       tasks: [],
     },

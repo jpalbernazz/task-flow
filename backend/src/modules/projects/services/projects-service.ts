@@ -9,11 +9,13 @@ import {
   findAllProjects,
   findProjectById,
   insertProject,
+  syncAllProjectMetrics,
   updateProject,
 } from "../repositories/projects-repository"
 import type { CreateProjectDTO, ProjectDTO, UpdateProjectDTO } from "../types/projects-types"
 
 export async function getProjects(): Promise<ProjectDTO[]> {
+  await syncAllProjectMetrics()
   const projects = await findAllProjects()
   return projects.map(entityToProjectDTO)
 }

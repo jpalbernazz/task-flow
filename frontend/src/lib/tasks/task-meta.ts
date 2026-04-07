@@ -13,7 +13,7 @@ export const taskStatusConfig: Record<
     className: "bg-primary/10 text-primary",
   },
   done: {
-    label: "Concluida",
+    label: "Concluída",
     className: "bg-success/10 text-success",
   },
 }
@@ -27,7 +27,7 @@ export const taskPriorityConfig: Record<
     className: "bg-muted text-muted-foreground",
   },
   medium: {
-    label: "Media",
+    label: "Média",
     className: "bg-warning/15 text-warning",
   },
   high: {

@@ -14,7 +14,7 @@ export default async function ProjectsPage() {
   try {
     initialProjects = await getProjectCards();
   } catch {
-    initialError = "Nao foi possivel carregar os projetos na inicializacao.";
+    initialError = "Não foi possível carregar os projetos na inicialização.";
   }
 
   return (

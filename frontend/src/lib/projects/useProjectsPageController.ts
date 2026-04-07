@@ -48,7 +48,7 @@ export function useProjectsPageController({
       setProjects(projectList)
       setErrorMessage(null)
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar os projetos."))
+      setErrorMessage(getErrorMessage(error, "Não foi possível carregar os projetos."))
     } finally {
       setIsRefreshing(false)
     }
@@ -85,7 +85,7 @@ export function useProjectsPageController({
         setErrorMessage(null)
         await refreshProjects()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel criar o projeto."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível criar o projeto."))
         throw error
       }
     },
@@ -97,7 +97,7 @@ export function useProjectsPageController({
       try {
         const updatedProject = await updateProject(projectId, input)
         if (!updatedProject) {
-          const notFoundError = new Error("O projeto nao foi encontrado para edicao.")
+          const notFoundError = new Error("O projeto não foi encontrado para edição.")
           setErrorMessage(notFoundError.message)
           throw notFoundError
         }
@@ -106,7 +106,7 @@ export function useProjectsPageController({
         setErrorMessage(null)
         await refreshProjects()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel editar o projeto."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível editar o projeto."))
         throw error
       }
     },
@@ -118,16 +118,16 @@ export function useProjectsPageController({
       try {
         const deleted = await deleteProject(projectId)
         if (!deleted) {
-          const notFoundError = new Error("O projeto nao foi encontrado para exclusao.")
+          const notFoundError = new Error("O projeto não foi encontrado para exclusão.")
           setErrorMessage(notFoundError.message)
           throw notFoundError
         }
 
-        setInfoMessage("Projeto excluido com sucesso.")
+        setInfoMessage("Projeto excluído com sucesso.")
         setErrorMessage(null)
         await refreshProjects()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir o projeto."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível excluir o projeto."))
         throw error
       }
     },

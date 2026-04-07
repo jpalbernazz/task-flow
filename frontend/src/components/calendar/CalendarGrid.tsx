@@ -31,7 +31,7 @@ export function CalendarGrid() {
     <>
       {!viewState.isRefreshing && !viewState.hasError && calendarTasks.length > 0 && monthSummary.tasksInMonth === 0 ? (
         <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
-          Nao ha tarefas para {MONTHS[month].toLowerCase()} de {year}. Navegue pelos meses ou clique em Hoje.
+          Não há tarefas para {MONTHS[month].toLowerCase()} de {year}. Navegue pelos meses ou clique em Hoje.
         </div>
       ) : null}
 
@@ -51,7 +51,7 @@ export function CalendarGrid() {
           <h2 className="text-lg font-semibold">
             {MONTHS[month]} {year}
           </h2>
-          <div className="text-sm text-muted-foreground">Calendario</div>
+          <div className="text-sm text-muted-foreground">Calendário</div>
         </div>
 
         <div className="grid grid-cols-7 border-b bg-muted/50">

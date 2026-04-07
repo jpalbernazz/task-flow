@@ -53,7 +53,7 @@ export function TaskEditModal({
         Cancelar
       </Button>
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Salvando..." : "Salvar Alteracoes"}
+        {isSubmitting ? "Salvando..." : "Salvar Alterações"}
       </Button>
     </>
   );

@@ -3,7 +3,7 @@ import type { KanbanColumnData, TaskStatus, TaskViewModel } from "@/lib/tasks/ty
 export const KANBAN_COLUMNS: ReadonlyArray<{ id: TaskStatus; title: string; color: string }> = [
   { id: "todo", title: "A Fazer", color: "bg-muted-foreground/70" },
   { id: "in_progress", title: "Em Progresso", color: "bg-primary" },
-  { id: "done", title: "Concluida", color: "bg-success" },
+  { id: "done", title: "Concluída", color: "bg-success" },
 ]
 
 export function buildKanbanColumns(tasks: TaskViewModel[]): KanbanColumnData[] {

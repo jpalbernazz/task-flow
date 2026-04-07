@@ -5,7 +5,7 @@ export const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
 export const MONTHS = [
   "Janeiro",
   "Fevereiro",
-  "Marco",
+  "Março",
   "Abril",
   "Maio",
   "Junho",
@@ -25,14 +25,14 @@ export const priorityColors = {
 
 export const priorityLabels = {
   high: "Alta",
-  medium: "Media",
+  medium: "Média",
   low: "Baixa",
 } as const
 
 export const statusLabels = {
   todo: "A Fazer",
   in_progress: "Em Progresso",
-  done: "Concluida",
+  done: "Concluída",
 } as const
 
 export const statusColors = {

@@ -50,7 +50,7 @@ export function ProjectEditModal({
         Cancelar
       </Button>
       <Button type="submit" disabled={isSubmitting || isDeleting}>
-        {isSubmitting ? "Salvando..." : "Salvar Alteracoes"}
+        {isSubmitting ? "Salvando..." : "Salvar Alterações"}
       </Button>
     </>
   );

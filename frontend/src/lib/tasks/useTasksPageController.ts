@@ -50,7 +50,7 @@ export function useTasksPageController({
       setProjects(projectList)
       setErrorMessage(null)
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar as tarefas."))
+      setErrorMessage(getErrorMessage(error, "Não foi possível carregar as tarefas."))
       setInfoMessage(null)
     } finally {
       setIsRefreshing(false)
@@ -110,7 +110,7 @@ export function useTasksPageController({
         setErrorMessage(null)
         await refreshData()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel criar a tarefa."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível criar a tarefa."))
         setInfoMessage(null)
         throw error
       }
@@ -123,7 +123,7 @@ export function useTasksPageController({
       try {
         const deleted = await deleteTask(taskId)
         if (!deleted) {
-          setErrorMessage("A tarefa nao foi encontrada para exclusao.")
+          setErrorMessage("A tarefa não foi encontrada para exclusão.")
           setInfoMessage(null)
           return
         }
@@ -132,7 +132,7 @@ export function useTasksPageController({
         setErrorMessage(null)
         await refreshData()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível excluir a tarefa."))
         setInfoMessage(null)
       }
     },
@@ -144,7 +144,7 @@ export function useTasksPageController({
       try {
         const updatedTask = await updateTask(taskId, payload)
         if (!updatedTask) {
-          const notFoundError = new Error("A tarefa nao foi encontrada para edicao.")
+          const notFoundError = new Error("A tarefa não foi encontrada para edição.")
           setErrorMessage(notFoundError.message)
           setInfoMessage(null)
           throw notFoundError
@@ -154,7 +154,7 @@ export function useTasksPageController({
         setErrorMessage(null)
         await refreshData()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel editar a tarefa."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível editar a tarefa."))
         setInfoMessage(null)
         throw error
       }
@@ -167,7 +167,7 @@ export function useTasksPageController({
       try {
         const deleted = await deleteTask(taskId)
         if (!deleted) {
-          const notFoundError = new Error("A tarefa nao foi encontrada para exclusao.")
+          const notFoundError = new Error("A tarefa não foi encontrada para exclusão.")
           setErrorMessage(notFoundError.message)
           setInfoMessage(null)
           throw notFoundError
@@ -177,7 +177,7 @@ export function useTasksPageController({
         setErrorMessage(null)
         await refreshData()
       } catch (error) {
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel excluir a tarefa."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível excluir a tarefa."))
         setInfoMessage(null)
         throw error
       }
@@ -218,7 +218,7 @@ export function useTasksPageController({
         setErrorMessage(null)
       } catch (error) {
         setTasks(previousTasks)
-        setErrorMessage(getErrorMessage(error, "Nao foi possivel reordenar as tarefas."))
+        setErrorMessage(getErrorMessage(error, "Não foi possível reordenar as tarefas."))
         setInfoMessage(null)
         throw error
       }

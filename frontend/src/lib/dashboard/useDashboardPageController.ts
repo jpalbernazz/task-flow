@@ -29,7 +29,7 @@ export function useDashboardPageController({
       setStats(data.stats)
       setRecentTasks(data.recentTasks)
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Nao foi possivel carregar os dados do painel."))
+      setErrorMessage(getErrorMessage(error, "Não foi possível carregar os dados do painel."))
     } finally {
       setIsRefreshing(false)
     }

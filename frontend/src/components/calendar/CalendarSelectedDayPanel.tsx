@@ -24,11 +24,11 @@ export function CalendarSelectedDayPanel() {
 
       {selectedDay === null ? (
         <p className="text-sm text-muted-foreground">
-          Clique em um dia do calendario para visualizar as tarefas.
+          Clique em um dia do calendário para visualizar as tarefas.
         </p>
       ) : selectedDayTasks.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Nao ha tarefas para {selectedDateLabel}.
+          Não há tarefas para {selectedDateLabel}.
         </p>
       ) : (
         <div className="flex flex-col gap-3">

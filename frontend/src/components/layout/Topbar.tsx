@@ -35,21 +35,21 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
-          <span className="sr-only">Notificacoes</span>
+          <span className="sr-only">Notificações</span>
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
+                <AvatarImage src="/placeholder-avatar.jpg" alt="Usuário" />
                 <AvatarFallback className="bg-primary text-sm text-primary-foreground">
                   JP
                 </AvatarFallback>
               </Avatar>
 
               <div className="hidden flex-col items-start md:flex">
-                <span className="text-sm font-medium">Joao Paulo</span>
+                <span className="text-sm font-medium">João Paulo</span>
                 <span className="text-xs text-muted-foreground">
                   Administrador
                 </span>
@@ -61,7 +61,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configuracoes</DropdownMenuItem>
+            <DropdownMenuItem>Configurações</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive">
               Sair
