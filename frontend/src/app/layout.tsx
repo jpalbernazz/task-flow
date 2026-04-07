@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/lib/theme/theme-provider";
+import { getThemeInitScript } from "@/lib/theme/theme-init-script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -43,12 +45,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeInitScript = getThemeInitScript();
+
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className={`${inter.className} font-sans antialiased`}>
-        {children}
-        <Toaster />
-        <Analytics />
+        <ThemeProvider>
+          {children}
+          <Toaster />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

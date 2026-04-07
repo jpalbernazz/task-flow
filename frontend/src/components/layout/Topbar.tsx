@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bell, LoaderCircle, LogOut, Menu, Settings, User } from "lucide-react";
+import Link from "next/link";
+import { LoaderCircle, LogOut, Menu, Settings, User } from "lucide-react";
 import { MyAccountModal } from "@/components/layout/MyAccountModal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -104,9 +104,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 <User className="h-4 w-4" />
                 Minha conta
               </DropdownMenuItem>
-              <DropdownMenuItem disabled>
-                <Settings className="h-4 w-4" />
-                Configurações
+              <DropdownMenuItem asChild>
+                <Link href="/configuracoes">
+                  <Settings className="h-4 w-4" />
+                  Configurações
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
